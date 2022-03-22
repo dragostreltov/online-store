@@ -18,7 +18,7 @@ public class ProductService {
 		products.add(new Product(3, "Xiaomi 11", "Telefon Xiaomi 11 Pro Max 5G, 1TB, White", 4000.0));
 	}
 	
-	public List<Product> listAll() {
+	public List<Product> listAllProducts() {
 		return products;
 	}
 	
@@ -31,7 +31,7 @@ public class ProductService {
 		return null;
 	}
 	
-	public Product save(Product prod) { // Admin - add products
+	public Product save(Product prod) { 
 		if(prod.getId()==null) {
 			prod.setId(++prodCount);
 		}

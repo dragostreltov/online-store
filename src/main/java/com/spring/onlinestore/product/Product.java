@@ -1,16 +1,29 @@
 package com.spring.onlinestore.product;
 
-import org.springframework.stereotype.Component;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
-@Component
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.onlinestore.subcategory.Subcategory;
+
+@Entity
 public class Product {
-	
+	@Id
+	@GeneratedValue
 	private Integer id;
 	private String name;
 	private String description;
 	private Double price;
 	
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JsonIgnore	
+	private Subcategory subcat;
+	
 	public Product() {
+		super();
 	}
 
 	public Product(Integer id, String name, String description, Double price) {

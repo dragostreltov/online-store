@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+// EXCLUDED FROM BUILD - ONLY ADDED FOR TESTING OF PRODUCT
+
 @RestController
 public class ProductResource {
 	
@@ -18,7 +20,7 @@ public class ProductResource {
 	
 	@GetMapping(path="/products")
 	public List<Product> retrieveAllProducts(){
-		return service.listAll();
+		return service.listAllProducts();
 	}
 	
 	@GetMapping(path="/products/{id}")
