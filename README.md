@@ -7,7 +7,7 @@ Online shopping with shopping lists management
 Eclipse:
 
 Project Setup
-  - Clone to workspace (online-store)
+  - Clone to workspace ({workspace}/online-store)
   - File -> Import
   - Existing Maven Projects 
   - Browse -> Select online-store
