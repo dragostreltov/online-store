@@ -1,5 +1,6 @@
 package com.spring.onlinestore.product;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,9 +15,15 @@ public class Product {
 	@Id
 	@GeneratedValue
 	private Integer id;
-	private String name;
-	private String description;
-	private Double price;
+	
+	@Column(name = "name")
+	private String a_name;
+	
+	@Column(name = "description")
+	private String b_description;
+	
+	@Column(name = "price")
+	private Double c_price;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JsonIgnore	
@@ -29,9 +36,9 @@ public class Product {
 	public Product(Integer id, String name, String description, Double price) {
 		super();
 		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.price = price;
+		this.a_name = name;
+		this.b_description = description;
+		this.c_price = price;
 	}
 
 	public Integer getId() {
@@ -43,27 +50,27 @@ public class Product {
 	}
 
 	public String getName() {
-		return name;
+		return a_name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.a_name = name;
 	}
 
 	public String getDescription() {
-		return description;
+		return b_description;
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
+		this.b_description = description;
 	}
 
 	public Double getPrice() {
-		return price;
+		return c_price;
 	}
 
 	public void setPrice(Double price) {
-		this.price = price;
+		this.c_price = price;
 	}
 	
 	public Subcategory getSubcat() {
@@ -76,7 +83,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return String.format("Product [id=%s, name=%s, description=%s, price=%s]", id, name, description, price);
+		return String.format("Product [id=%s, name=%s, description=%s, price=%s]", id, a_name, b_description, c_price);
 	}
 	
 }
