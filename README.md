@@ -1,30 +1,23 @@
 # Online Store
 Online shopping with shopping lists management 
 
+## Eclipse
 
-
-
-Eclipse:
-
-Project Setup
+### Project Setup
   - Clone to workspace ({workspace}/online-store)
   - File -> Import
   - Existing Maven Projects 
   - Browse -> Select online-store
   - Check pom.xml -> Finish
 
-How to run:
+### How to run:
   - Open /online-store/src/main/java/com/spring/onlinestore/OnlineStoreApplication.java
   - Run as "Java Application"
+ 
 
-
-
-
-REST API Request Mapping (listed before Swagger implementation):
+## REST API Request Mapping (listed before Swagger implementation):
   - retrieveAllCategories: 
     - GET /categs
-  - retrieveCategory: 
-    - GET /categs/{id}
   - createCategory: 
     - POST /categs
   - editCategory: 
