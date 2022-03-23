@@ -28,7 +28,7 @@ public class SubcategoryResource {
 	private SubcategoryRepository subcategoryRepository;
 	
 	@GetMapping(path="/categs/{id}/sub")
-	public List<Subcategory> retrieveSubcategories(@PathVariable int id){
+	public List<Subcategory> retrieveAllSubcategories(@PathVariable int id){
 		 Optional<Category> cat = categoryRepository.findById(id);
 		 if(!cat.isPresent()) {
 			 throw new RuntimeException("id - " + id);

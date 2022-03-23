@@ -30,7 +30,7 @@ public class ProductResource {
 	
 	
 	@GetMapping("/categs/sub/{id}/products")
-	public List<Product> retrieveProducts(@PathVariable int id){
+	public List<Product> retrieveAllProducts(@PathVariable int id){
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		 if(!optional.isPresent()) {
 			 throw new RuntimeException("id - " + id);
