@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.spring.onlinestore.subcategory.Subcategory;
 import com.spring.onlinestore.subcategory.SubcategoryRepository;
 
@@ -28,7 +29,7 @@ public class ProductResource {
 	private SubcategoryRepository subcategoryRepository;
 	
 	
-	
+	@JsonView(ProductView.DescriptionExcluded.class)
 	@GetMapping("/categs/sub/{id}/products")
 	public List<Product> retrieveAllProducts(@PathVariable int id){
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);

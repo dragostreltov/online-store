@@ -9,6 +9,7 @@ import javax.persistence.OneToMany;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.spring.onlinestore.subcategory.Subcategory;
 
 @Component
@@ -17,7 +18,10 @@ public class Category {
 	
 	@Id
 	@GeneratedValue
+	@JsonView(CategoryView.SubcatsExcluded.class)
 	private Integer id;
+	
+	@JsonView(CategoryView.SubcatsExcluded.class)
 	private String name;
 	
 	@OneToMany(mappedBy = "cat")
