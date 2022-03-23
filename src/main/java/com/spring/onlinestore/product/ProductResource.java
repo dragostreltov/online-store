@@ -40,7 +40,7 @@ public class ProductResource {
 		 // HATEOAS - check product x
 	}
 	
-	@GetMapping("/categs/sub/products/{id}")
+	@GetMapping("/categs/sub/*/products/{id}")
 	public Optional<Product> retrieveProduct(@PathVariable int id) {
 		return productRepository.findById(id);
 		
@@ -60,14 +60,19 @@ public class ProductResource {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@PutMapping("/categs/sub/products/{id}")
-	public ResponseEntity<Object> editProduct(@PathVariable int id, @RequestBody Product prod) {
-		Product savedProd = productRepository.save(prod);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedProd.getId()).toUri();
-		return ResponseEntity.created(location).build();
+	@PutMapping("/categs/sub/{id}/products/{id2}")
+	public Product editProduct(@PathVariable int id, @PathVariable int id2, @RequestBody Product prod) {
+		Optional<Subcategory> optional = subcategoryRepository.findById(id);
+		 if(!optional.isPresent()) {
+			 throw new RuntimeException("id - " + id);
+		 }
+		Subcategory sub = optional.get();
+		prod.setSubcat(sub);
+		prod.setId(id2);
+		return productRepository.save(prod);
 	}
 	
-	@DeleteMapping("/categs/sub/products/{id}")
+	@DeleteMapping("/categs/sub/*/products/{id}")
 	public void deleteProduct(@PathVariable int id) {
 		productRepository.deleteById(id);
 	}

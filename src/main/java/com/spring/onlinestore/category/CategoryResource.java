@@ -44,13 +44,12 @@ public class CategoryResource {
 	}
 	
 	@PutMapping(path="/categs/{id}")
-	public ResponseEntity<Object> editCategory(@PathVariable int id, @RequestBody Category categ) {
-		Category savedCateg = categoryRepository.save(categ);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedCateg.getId()).toUri();
-		return ResponseEntity.created(location).build();
+	public Category editCategory(@PathVariable int id, @RequestBody Category categ) {
+		categ.setId(id);
+		return categoryRepository.save(categ);
 	}
 	
-	@DeleteMapping(path="/categs")
+	@DeleteMapping(path="/categs/{id}")
 	public void deleteCategory(@PathVariable int id) {
 		categoryRepository.deleteById(id);	
 	}

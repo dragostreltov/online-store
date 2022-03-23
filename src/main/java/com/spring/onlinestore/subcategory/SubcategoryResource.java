@@ -50,14 +50,19 @@ public class SubcategoryResource {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@PutMapping(path="/categs/sub/{id}")
-	public ResponseEntity<Object> editSubcategory(@PathVariable int id, @RequestBody Subcategory sub) {
-		Subcategory savedSub = subcategoryRepository.save(sub);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedSub.getId()).toUri();
-		return ResponseEntity.created(location).build();
+	@PutMapping(path="/categs/{id}/sub/{id2}")
+	public Subcategory editSubcategory(@PathVariable int id, @PathVariable int id2, @RequestBody Subcategory sub) {
+		Optional<Category> optional = categoryRepository.findById(id);
+		 if(!optional.isPresent()) {
+			 throw new RuntimeException("id - " + id);
+		 }
+		Category cat = optional.get();
+		sub.setCat(cat);
+		sub.setId(id2);
+		return subcategoryRepository.save(sub);
 	}
 	
-	@DeleteMapping(path="/categs/sub/{id}")
+	@DeleteMapping(path="/categs/*/sub/{id}")
 	public void deleteSubcategory(@PathVariable int id) {
 		subcategoryRepository.deleteById(id);
 	}
