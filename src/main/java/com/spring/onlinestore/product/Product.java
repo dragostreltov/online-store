@@ -65,6 +65,14 @@ public class Product {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+	
+	public Subcategory getSubcat() {
+		return subcat;
+	}
+
+	public void setSubcat(Subcategory subcat) {
+		this.subcat = subcat;
+	}
 
 	@Override
 	public String toString() {

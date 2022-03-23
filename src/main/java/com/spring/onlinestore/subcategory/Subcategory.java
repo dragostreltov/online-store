@@ -27,7 +27,7 @@ public class Subcategory {
 	private List<Product> prods;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@JsonIgnore	
+	@JsonIgnore
 	private Category cat;
 	
 	
