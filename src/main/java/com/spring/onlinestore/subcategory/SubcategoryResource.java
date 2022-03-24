@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.spring.onlinestore.category.Category;
 import com.spring.onlinestore.category.CategoryRepository;
+import com.spring.onlinestore.exception.NotFoundException;
 
 @RestController
 public class SubcategoryResource {
@@ -32,17 +33,15 @@ public class SubcategoryResource {
 	@GetMapping(path="/categs/{id}/sub")
 	public List<Subcategory> retrieveAllSubcategories(@PathVariable int id){
 		 Optional<Category> cat = categoryRepository.findById(id);
-		 if(!cat.isPresent()) {
-			 throw new RuntimeException("id - " + id);
-		 }
-		 
+		 if(!cat.isPresent()) throw new NotFoundException("Category id - " + id);
+		
 		 return cat.get().getSubcats();
 	}
 	
 	@PostMapping(path="/categs/{id}/sub")
 	public ResponseEntity<Object> createSubcategory(@PathVariable int id, @RequestBody Subcategory sub) {
 		Optional<Category> optional = categoryRepository.findById(id);
-		if(!optional.isPresent()) throw new RuntimeException("id - " + id);
+		if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);
 		
 		Category cat = optional.get();
 		sub.setCat(cat);
@@ -55,17 +54,23 @@ public class SubcategoryResource {
 	@PutMapping(path="/categs/{id}/sub/{id2}")
 	public Subcategory editSubcategory(@PathVariable int id, @PathVariable int id2, @RequestBody Subcategory sub) {
 		Optional<Category> optional = categoryRepository.findById(id);
-		 if(!optional.isPresent()) {
-			 throw new RuntimeException("id - " + id);
-		 }
+		if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);
+		
 		Category cat = optional.get();
 		sub.setCat(cat);
+		
+		Optional<Subcategory> optional2 = subcategoryRepository.findById(id2);
+		if(!optional2.isPresent()) throw new NotFoundException("Subcategory id - " + id2);		
+		
 		sub.setId(id2);
 		return subcategoryRepository.save(sub);
 	}
 	
 	@DeleteMapping(path="/categs/*/sub/{id}")
 	public void deleteSubcategory(@PathVariable int id) {
+		Optional<Subcategory> optional2 = subcategoryRepository.findById(id);
+		if(!optional2.isPresent()) throw new NotFoundException("Subcategory id - " + id);
+		
 		subcategoryRepository.deleteById(id);
 	}
 }

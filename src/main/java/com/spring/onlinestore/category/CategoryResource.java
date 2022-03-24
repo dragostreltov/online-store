@@ -2,6 +2,7 @@ package com.spring.onlinestore.category;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.spring.onlinestore.exception.NotFoundException;
 
 
 @RestController
@@ -29,17 +31,6 @@ public class CategoryResource {
 	public List<Category> retrieveAllCategories(){
 		return categoryRepository.findAll();
 	}
-
-	/* USE ONLY FOR TESTING
-	
-	@GetMapping(path="/categs/{id}")
-	public Optional<Category> retrieveCategory(@PathVariable int id) {
-		Optional<Category> optional = categoryRepository.findById(id);
-		if(optional.isEmpty()) throw new RuntimeException("id - " + id);
-		return optional;
-	}
-	
-	*/
 	
 	@PostMapping(path="/categs")
 	public ResponseEntity<Object> createCategory(@RequestBody Category categ) {
@@ -50,12 +41,16 @@ public class CategoryResource {
 	
 	@PutMapping(path="/categs/{id}")
 	public Category editCategory(@PathVariable int id, @RequestBody Category categ) {
+		Optional<Category> optional = categoryRepository.findById(id);
+		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
 		categ.setId(id);
 		return categoryRepository.save(categ);
 	}
 	
 	@DeleteMapping(path="/categs/{id}")
 	public void deleteCategory(@PathVariable int id) {
+		Optional<Category> optional = categoryRepository.findById(id);
+		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
 		categoryRepository.deleteById(id);	
 	}
 	
