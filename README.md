@@ -10,12 +10,16 @@ Online shopping with shopping lists management
   - Browse -> Select online-store
   - Check pom.xml -> Finish
 
-### How to run:
+### How to run
   - Open /online-store/src/main/java/com/spring/onlinestore/OnlineStoreApplication.java
   - Run as "Java Application"
  
 
-## REST API Request Mapping (listed before Swagger implementation):
+## REST API Request Mapping (listed before Swagger implementation)
+Default request URL: http://localhost:8080
+
+Recommended API Testing app: Postman
+
   - retrieveAllCategories: 
     - GET /categs
   - createCategory: 
