@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
 
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ public class Category {
 	private Integer id;
 	
 	@JsonView(CategoryView.SubcatsExcluded.class)
+	@Size(min = 2, message = "Name should have at least 2 characters")
 	private String name;
 	
 	@OneToMany(mappedBy = "cat")

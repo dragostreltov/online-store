@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,14 +35,14 @@ public class CategoryResource {
 	}
 	
 	@PostMapping(path="/categs")
-	public ResponseEntity<Object> createCategory(@RequestBody Category categ) {
+	public ResponseEntity<Object> createCategory(@Valid @RequestBody Category categ) {
 		Category savedCateg = categoryRepository.save(categ);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedCateg.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
 	@PutMapping(path="/categs/{id}")
-	public Category editCategory(@PathVariable int id, @RequestBody Category categ) {
+	public Category editCategory(@PathVariable int id, @Valid @RequestBody Category categ) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
 		categ.setId(id);

@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,7 +54,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/categs/sub/{id}/products")
-	public ResponseEntity<Object> createProduct(@PathVariable int id, @RequestBody Product prod) {
+	public ResponseEntity<Object> createProduct(@PathVariable int id, @Valid @RequestBody Product prod) {
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
 		
@@ -65,7 +67,7 @@ public class ProductResource {
 	}
 	
 	@PutMapping("/categs/sub/{id}/products/{id2}")
-	public Product editProduct(@PathVariable int id, @PathVariable int id2, @RequestBody Product prod) {
+	public Product editProduct(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Product prod) {
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
 		
