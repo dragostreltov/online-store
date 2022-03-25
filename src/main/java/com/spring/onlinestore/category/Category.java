@@ -33,11 +33,11 @@ public class Category {
 		super();
 	}
 
-	public Category(Integer id, String name, List<Subcategory> cats) {
+	public Category(Integer id, String name, List<Subcategory> subcats) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.subcats = cats;
+		this.subcats = subcats;
 	}
 
 	public Integer getId() {
@@ -60,8 +60,8 @@ public class Category {
 		return subcats;
 	}
 
-	public void setCats(List<Subcategory> cats) {
-		this.subcats = cats;
+	public void setCats(List<Subcategory> subcats) {
+		this.subcats = subcats;
 	}
 
 	@Override

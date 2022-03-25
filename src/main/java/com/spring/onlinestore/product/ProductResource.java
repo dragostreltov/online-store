@@ -1,5 +1,8 @@
 package com.spring.onlinestore.product;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +10,8 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,27 +38,34 @@ public class ProductResource {
 	
 	
 	@JsonView(ProductView.DescriptionExcluded.class)
-	@GetMapping("/categs/sub/{id}/products")
+	@GetMapping("/categs/*/sub/{id}/products")
 	public List<Product> retrieveAllProducts(@PathVariable int id){
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		 if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
+		 Subcategory sub = optional.get();
 		 
-		 return optional.get().getProds();
-		 
+
 		 // HATEOAS - check product x
+		 EntityModel<Subcategory> resource = EntityModel.of(sub);
+		 WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveProduct(0));
+		 resource.add(linkTo.withRel("check a product"));
+		 
+		 
+		 return sub.getProds();
 	}
 	
-	@GetMapping("/categs/sub/*/products/{id}")
-	public Optional<Product> retrieveProduct(@PathVariable int id) {
+	@GetMapping("/categs/*/sub/*/products/{id}")
+	public Product retrieveProduct(@PathVariable int id) {
 		Optional<Product> optional = productRepository.findById(id);
-		if(!optional.isPresent()) throw new NotFoundException("Product id - " + id);		
-		
-		return optional;
+		if(!optional.isPresent()) throw new NotFoundException("Product id - " + id);
+
+		return optional.get();
 		
 		// HATEOAS - add product to shopping list
+		
 	}
 	
-	@PostMapping("/categs/sub/{id}/products")
+	@PostMapping("/categs/*/sub/{id}/products")
 	public ResponseEntity<Object> createProduct(@PathVariable int id, @Valid @RequestBody Product prod) {
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
@@ -66,7 +78,7 @@ public class ProductResource {
 		return ResponseEntity.created(location).build();
 	}
 	
-	@PutMapping("/categs/sub/{id}/products/{id2}")
+	@PutMapping("/categs/*/sub/{id}/products/{id2}")
 	public Product editProduct(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Product prod) {
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
@@ -81,7 +93,7 @@ public class ProductResource {
 		return productRepository.save(prod);
 	}
 	
-	@DeleteMapping("/categs/sub/*/products/{id}")
+	@DeleteMapping("/categs/*/sub/*/products/{id}")
 	public void deleteProduct(@PathVariable int id) {
 		Optional<Product> optional = productRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Product id - " + id);
