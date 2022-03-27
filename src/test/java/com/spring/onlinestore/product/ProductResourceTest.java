@@ -87,6 +87,12 @@ public class ProductResourceTest {
 		
 		Product product = new Product(10, "samsung", "smartphone", 1000.0);
 		
+		// For HATEOAS link
+		Subcategory subcat = new Subcategory();
+		subcat.setId(2);
+		product.setSubcat(subcat);
+		/////////////////////////
+		
 		productRepository.saveAndFlush(product);
 
 		doReturn(Optional.of(product)).when(productRepository).findById(10);
@@ -96,7 +102,8 @@ public class ProductResourceTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.name").value("samsung"))
 			.andExpect(jsonPath("$.description").value("smartphone"))
-			.andExpect(jsonPath("$.price").value(1000.0));
+			.andExpect(jsonPath("$.price").value(1000.0))
+			.andExpect(jsonPath("$.links[0].href").value("http://localhost/categs/*/sub/2/products"));
 	}
 	
 	@Test

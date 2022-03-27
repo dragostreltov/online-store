@@ -42,26 +42,36 @@ public class ProductResource {
 	public List<Product> retrieveAllProducts(@PathVariable int id){
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		 if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
+		
 		 Subcategory sub = optional.get();
+		 List<Product> list = sub.getProds();
 		 
-
-		 // HATEOAS - check product x
-		 EntityModel<Subcategory> resource = EntityModel.of(sub);
-		 WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveProduct(0));
-		 resource.add(linkTo.withRel("check a product"));
+		 return list;
 		 
-		 
-		 return sub.getProds();
+		 // HATEOAS - check product template //
+		 //// ISSUE : Displays empty object
+//		 Link link = linkTo(methodOn(this.getClass()).retrieveProduct(10111)).withRel("check-product-template");
+//		 CollectionModel<Product> result = CollectionModel.of(list,link);
+//		 return result;
+		 //////////////////////////////////////
 	}
 	
 	@GetMapping("/categs/*/sub/*/products/{id}")
-	public Product retrieveProduct(@PathVariable int id) {
+	public EntityModel<Product> retrieveProduct(@PathVariable int id) {
 		Optional<Product> optional = productRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Product id - " + id);
 
-		return optional.get();
+		Subcategory subcat = optional.get().getSubcat();
+		EntityModel<Product> res = EntityModel.of(optional.get());
+		
+		// HATEOAS - check similar products
+		WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllProducts(subcat.getId()));
+		res.add(linkTo.withRel("check-similar-products"));
 		
 		// HATEOAS - add product to shopping list
+		// TO-DO
+		
+		return res;
 		
 	}
 	
