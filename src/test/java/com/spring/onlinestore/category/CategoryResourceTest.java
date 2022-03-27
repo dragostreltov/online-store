@@ -8,6 +8,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -48,14 +51,26 @@ public class CategoryResourceTest {
 	@Test
 	final void retrieveAllCategoriesTest() throws Exception {
 		
+		List<Subcategory> sub = new ArrayList<>();
+		Category cat1 = new Category(1, "Category 1", sub);
+		Category cat2 = new Category(2, "Category 2", sub);
+		List<Category> cats = List.of(cat1, cat2);
+		
+		doReturn(cats).when(categoryRepository).findAll();
+		
 		this.mockMvc.perform(get("/categs"))
-		.andExpect(status().isOk());
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].id").value(1))
+				.andExpect(jsonPath("$[0].name").value("Category 1"))
+				.andExpect(jsonPath("$[1].id").value(2))
+				.andExpect(jsonPath("$[1].name").value("Category 2"));
 	}
 	
 	@Test
 	final void createCategoryTest() throws Exception {
 		List<Subcategory> subcats = new ArrayList<>();
-        Category category = new Category(null, "Masini", subcats);
+        Category category = new Category(1, "Masini", subcats);
         
 		ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(category);
@@ -68,7 +83,9 @@ public class CategoryResourceTest {
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-				.andExpect(status().isCreated());
+				.andExpect(status().isCreated())
+				.andExpect(header().string("Location", "http://localhost/categs/1"))
+				.andExpect(redirectedUrl("http://localhost/categs/1"));
 	}
 	
 	@Test
@@ -91,7 +108,10 @@ public class CategoryResourceTest {
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-        		.andExpect(status().isOk());
+        		.andExpect(status().isOk())
+    			.andExpect(jsonPath("$.id").value(1))
+    			.andExpect(jsonPath("$.name").value("Masini"))
+        		;
 	}
 	
 	@Test
