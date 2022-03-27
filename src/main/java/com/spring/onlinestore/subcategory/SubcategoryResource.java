@@ -34,10 +34,11 @@ public class SubcategoryResource {
 	@JsonView(SubcategoryView.ProductsExcluded.class)
 	@GetMapping(path="/categs/{id}/sub")
 	public List<Subcategory> retrieveAllSubcategories(@PathVariable int id){
-		 Optional<Category> cat = categoryRepository.findById(id);
-		 if(!cat.isPresent()) throw new NotFoundException("Category id - " + id);
-		
-		 return cat.get().getSubcats();
+		 Optional<Category> optional = categoryRepository.findById(id);
+		 if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);
+		 Category cat = optional.get();
+		 
+		 return cat.getSubcats();
 	}
 	
 	@PostMapping(path="/categs/{id}/sub")

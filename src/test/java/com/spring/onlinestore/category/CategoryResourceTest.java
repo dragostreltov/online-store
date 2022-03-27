@@ -24,7 +24,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -32,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.onlinestore.subcategory.Subcategory;
 
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = CategoryResource.class)
 public class CategoryResourceTest {
 	
 	@Mock
@@ -110,8 +108,7 @@ public class CategoryResourceTest {
 				.andDo(print())
         		.andExpect(status().isOk())
     			.andExpect(jsonPath("$.id").value(1))
-    			.andExpect(jsonPath("$.name").value("Masini"))
-        		;
+    			.andExpect(jsonPath("$.name").value("Masini"));
 	}
 	
 	@Test
