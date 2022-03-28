@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -36,24 +37,20 @@ public class ProductResource {
 	@Autowired
 	private SubcategoryRepository subcategoryRepository;
 	
-	
 	@JsonView(ProductView.DescriptionExcluded.class)
 	@GetMapping("/categs/*/sub/{id}/products")
-	public List<Product> retrieveAllProducts(@PathVariable int id){
+	public CollectionModel<Product> retrieveAllProducts(@PathVariable int id){
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		 if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
 		
 		 Subcategory sub = optional.get();
 		 List<Product> list = sub.getProds();
 		 
-		 return list;
+		 list.stream().forEach(e -> {
+			 e.add(linkTo(methodOn(this.getClass()).retrieveProduct(e.getId())).withSelfRel());
+		 });
 		 
-		 // HATEOAS - check product template //
-		 //// ISSUE : Displays empty object
-//		 Link link = linkTo(methodOn(this.getClass()).retrieveProduct(10111)).withRel("check-product-template");
-//		 CollectionModel<Product> result = CollectionModel.of(list,link);
-//		 return result;
-		 //////////////////////////////////////
+		 return CollectionModel.of(list);
 	}
 	
 	@GetMapping("/categs/*/sub/*/products/{id}")

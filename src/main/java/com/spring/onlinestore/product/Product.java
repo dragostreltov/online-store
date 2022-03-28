@@ -7,12 +7,14 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.spring.onlinestore.subcategory.Subcategory;
 
 @Entity
-public class Product {
+public class Product extends RepresentationModel<Product>{
 	@Id
 	@GeneratedValue
 	@JsonView(ProductView.DescriptionExcluded.class)
@@ -22,6 +24,7 @@ public class Product {
 	@Size(min = 2, message = "Name should have at least 2 characters")
 	private String name;
 	
+	@JsonView(ProductView.DescriptionView.class)
 	@Size(min = 2, message = "Description should have at least 2 characters")
 	private String description;
 	
