@@ -15,34 +15,47 @@ Online shopping with shopping lists management
   - Run as "Java Application"
  
 
-## REST API Request Mapping (listed before Swagger implementation)
+## REST API Request Mapping
 Default request URL: http://localhost:8080
 
-Recommended API Testing app: Postman
+Register user: 
+  - POST /user
+  - No Auth
+  - body template:
+{
+	"username": " ",
+	"password": " "
+}
 
+For registered users, please use _Basic Auth_.
+
+### Mapping for USER:
   - retrieveAllCategories: 
     - GET /categs
+  - retrieveAllSubcategories: 
+    - GET /categs/{id}/sub
+  - retrieveAllProducts: 
+    - GET /categs/\*/sub/{id}/products
+  - retrieveProduct: 
+    - GET /categs/\*/sub/\*/products/{id}
+
+### Mapping for ADMIN:  
+  - All **USER** mapping +
   - createCategory: 
     - POST /categs
-  - editCategory: 
+  - editCategory:
     - PUT /categs/{id}
   - deleteCategory: 
     - DELETE /categs/{id}
-  - retrieveAllSubcategories: 
-    - GET /categs/{id}/sub
   - createSubcategory: 
     - POST /categs/{id}/sub
   - editSubcategory: 
     - PUT /categs/{id}/sub/{id2}
   - deleteSubcategory: 
     - DELETE /categs/\*/sub/{id}
-  - retrieveAllProducts: 
-    - GET /categs/sub/{id}/products
-  - retrieveProduct: 
-    - GET /categs/sub/\*/products/{id}
   - createProduct: 
-    - POST /categs/sub/{id}/products
+    - POST /categs/\*/sub/{id}/products
   - editProduct: 
-    - PUT /categs/sub/{id}/products/{id2}
+    - PUT /categs/\*/sub/{id}/products/{id2}
   - deleteProduct: 
-    - DELETE /categs/sub/\*/products/{id}
+    - DELETE /categs/\*/sub/\*/products/{id}
