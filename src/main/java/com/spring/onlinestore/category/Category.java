@@ -2,6 +2,7 @@ package com.spring.onlinestore.category;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -26,7 +27,8 @@ public class Category {
 	@Size(min = 2, message = "Name should have at least 2 characters")
 	private String name;
 	
-	@OneToMany(mappedBy = "cat")
+	@JsonView(CategoryView.SubcatsIncluded.class)
+	@OneToMany(mappedBy = "cat", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Subcategory> subcats;
 
 	public Category() {

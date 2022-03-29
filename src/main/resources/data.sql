@@ -7,3 +7,6 @@ insert into product values(10112, 'Telefon SAMSUNG Galaxy M52 5G, 128GB, GB RAM,
 insert into product values(10113, 'Telefon SAMSUNG Galaxy A22 5G, 64GB, 4GB RAM, Dual SIM, Gray', 'SAMSUNG Galaxy A22', 839.0, 1011);
 insert into product values(10121, 'Tableta SAMSUNG Galaxy Tab A7 Lite, 8.7", 32GB, 3GB RAM, Wi-Fi + 4G, Silver', 'SAMSUNG Galaxy Tab A7 Lite', 665.1, 1012);
 insert into product values(10122, 'Tableta APPLE iPad 9 (2021), 10.2", 64GB, Wi-Fi, Space Grey', 'APPLE iPad 9 (2021)', 1890.0, 1012);
+insert into role values(100, 'ROLE_ADMIN');
+insert into role values(101, 'ROLE_USER');
+insert into user values(10001, true, 'admin', 'admin', 100);
