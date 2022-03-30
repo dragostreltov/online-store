@@ -30,6 +30,10 @@ Register user:
 For registered users, please use _Basic Auth_.
 
 ### Mapping for USER:
+  - editUser: 
+    - PUT /user/{name}
+  - deleteUser: 
+    - DELETE /user/{name}
   - retrieveAllCategories: 
     - GET /categs
   - retrieveAllSubcategories: 
