@@ -41,19 +41,23 @@ public class CategoryResource {
 		return ResponseEntity.created(location).build();
 	}
 	
+	@JsonView(CategoryView.SubcatsExcluded.class)
 	@PutMapping(path="/categs/{id}")
 	public Category editCategory(@PathVariable int id, @Valid @RequestBody Category categ) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
+		Category cat = optional.get();
+		categ.setCats(cat.getSubcats());
 		categ.setId(id);
 		return categoryRepository.save(categ);
 	}
 	
 	@DeleteMapping(path="/categs/{id}")
-	public void deleteCategory(@PathVariable int id) {
+	public ResponseEntity<String> deleteCategory(@PathVariable int id) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
-		categoryRepository.deleteById(id);	
+		categoryRepository.deleteById(id);
+		return ResponseEntity.ok().body("Category deleted");
 	}
 	
 }

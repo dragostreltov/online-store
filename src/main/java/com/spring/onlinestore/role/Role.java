@@ -10,6 +10,7 @@ import javax.persistence.OneToMany;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.onlinestore.user.User;
 
 @Component
@@ -23,6 +24,7 @@ public class Role {
     private String name;
     
     @OneToMany(mappedBy = "role")
+    @JsonIgnore
     private List<User> users;
     
     public Role() {

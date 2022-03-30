@@ -22,8 +22,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         
     	// Authorized H2 access public - WILL BE DISABLED BEFORE RELEASE
         http.httpBasic().and().authorizeRequests()
-        		.antMatchers("/user", "/h2-console/**", "/error").permitAll()
+        		.antMatchers("/h2-console/**", "/error").permitAll()
+        		.antMatchers(HttpMethod.POST, "/user").permitAll()
           		.antMatchers(HttpMethod.GET, "/categs/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
+          		.antMatchers("/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
           		.antMatchers("/categs/**").hasAnyAuthority("ROLE_ADMIN")
           		.anyRequest().authenticated()
           		.and().formLogin().permitAll()

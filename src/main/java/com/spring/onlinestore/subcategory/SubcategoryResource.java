@@ -53,7 +53,8 @@ public class SubcategoryResource {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(sub.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
-	
+
+	@JsonView(SubcategoryView.ProductsExcluded.class)
 	@PutMapping(path="/categs/{id}/sub/{id2}")
 	public Subcategory editSubcategory(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Subcategory sub) {
 		Optional<Category> optional = categoryRepository.findById(id);
@@ -63,17 +64,20 @@ public class SubcategoryResource {
 		sub.setCat(cat);
 		
 		Optional<Subcategory> optional2 = subcategoryRepository.findById(id2);
-		if(!optional2.isPresent()) throw new NotFoundException("Subcategory id - " + id2);		
+		if(!optional2.isPresent()) throw new NotFoundException("Subcategory id - " + id2);
+		Subcategory subcat = optional2.get();
 		
+		sub.setProds(subcat.getProds());
 		sub.setId(id2);
 		return subcategoryRepository.save(sub);
 	}
 	
 	@DeleteMapping(path="/categs/*/sub/{id}")
-	public void deleteSubcategory(@PathVariable int id) {
+	public ResponseEntity<String> deleteSubcategory(@PathVariable int id) {
 		Optional<Subcategory> optional2 = subcategoryRepository.findById(id);
 		if(!optional2.isPresent()) throw new NotFoundException("Subcategory id - " + id);
 		
 		subcategoryRepository.deleteById(id);
+		return ResponseEntity.ok().body("Subcategory deleted");
 	}
 }
