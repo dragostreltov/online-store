@@ -34,6 +34,18 @@ For registered users, please use _Basic Auth_.
     - PUT /user/{name}
   - deleteUser: 
     - DELETE /user/{name}
+  - retrieveListsForUser: 
+    - GET /user/lists
+  - createShoppinglist: 
+    - POST /user/lists
+  - editShoppinglist: 
+    - PUT /user/lists/{id}
+  - deleteShoppinglist: 
+    - DELETE /user/lists/{id}
+  - getShoppinglistProducts: 
+    - GET /user/lists/{id}
+  - addProductToShoppinglist: 
+    - POST /user/lists/{id}/{id2}
   - retrieveAllCategories: 
     - GET /categs
   - retrieveAllSubcategories: 
