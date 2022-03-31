@@ -10,3 +10,9 @@ insert into product values(10122, 'Tableta APPLE iPad 9 (2021), 10.2", 64GB, Wi-
 insert into role values(100, 'ROLE_ADMIN');
 insert into role values(101, 'ROLE_USER');
 insert into user values(10001, true, 'admin', 'admin', 100);
+insert into shopping_list values(11, 'test list', 10001);
+insert into shopping_list values(12, 'test list2', 10001);
+insert into shopping_product values(10111, 11);
+insert into shopping_product values(10112, 11);
+insert into shopping_product values(10111, 12);
+insert into shopping_product values(10113, 12);

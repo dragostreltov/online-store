@@ -1,7 +1,6 @@
 package com.spring.onlinestore.product;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -13,8 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -28,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring.onlinestore.shoppinglist.ShoppingList;
 import com.spring.onlinestore.subcategory.Subcategory;
 import com.spring.onlinestore.subcategory.SubcategoryRepository;
 
@@ -59,12 +61,10 @@ public class ProductResourceTest {
 		sub.setId(1);
 //		Subcategory subcat = new Subcategory();
 //		subcat.setId(2);
+		Set<ShoppingList> shoppinglists = new HashSet<>();
 		
-		Product product = new Product(10, "samsung", "smartphone", 1000.0);
-		product.setSubcat(sub);
-		
-		Product product2 = new Product(11, "apple", "smartphone 2", 900.0);
-		product2.setSubcat(sub);
+		Product product = new Product(10, "samsung", "smartphone", 1000.0, sub, shoppinglists);
+		Product product2 = new Product(11, "apple", "smartphone 2", 900.0, sub, shoppinglists);
 		
 		productRepository.saveAndFlush(product);
 		productRepository.saveAndFlush(product2);
@@ -93,13 +93,12 @@ public class ProductResourceTest {
 	@Test
 	final void retrieveProductTest() throws Exception {
 		
-		Product product = new Product(10, "samsung", "smartphone", 1000.0);
-		
+		Set<ShoppingList> shoppinglists = new HashSet<>();
 		// For HATEOAS link
 		Subcategory subcat = new Subcategory();
 		subcat.setId(2);
-		product.setSubcat(subcat);
 		/////////////////////////
+		Product product = new Product(10, "samsung", "smartphone", 1000.0, subcat, shoppinglists);
 		
 		productRepository.saveAndFlush(product);
 
@@ -116,10 +115,10 @@ public class ProductResourceTest {
 	
 	@Test
 	final void createProductTest() throws Exception {
-		
+	
+		Set<ShoppingList> shoppinglists = new HashSet<>();
 		sub.setId(1);
-		Product product = new Product(10, "samsung", "smartphone", 1000.0);
-		product.setSubcat(sub);
+		Product product = new Product(10, "samsung", "smartphone", 1000.0, sub, shoppinglists);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(product);
@@ -141,12 +140,11 @@ public class ProductResourceTest {
 	@Test
 	final void editProductTest() throws Exception {
 		
+		Set<ShoppingList> shoppinglists = new HashSet<>();
 		sub.setId(1);
-		Product product = new Product(10, "samsung", "smartphone", 1000.0);
-		product.setSubcat(sub);
+		Product product = new Product(10, "samsung", "smartphone", 1000.0, sub, shoppinglists);
 		productRepository.saveAndFlush(product);
-		
-		Product product2 = new Product(10, "apple", "new smartphone", 1100.0);
+		Product product2 = new Product(10, "apple", "new smartphone", 1100.0, sub, shoppinglists);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(product2);
@@ -170,12 +168,12 @@ public class ProductResourceTest {
 	
 	@Test
 	final void deleteProductTest() throws Exception {
-		
-		Product product = new Product(10, "samsung", "smartphone", 1000.0);
+		Set<ShoppingList> shoppinglists = new HashSet<>();
+		Product product = new Product(10, "samsung", "smartphone", 1000.0, sub, shoppinglists);
 		productRepository.saveAndFlush(product);
 		
 		doReturn(Optional.of(product)).when(productRepository).findById(10);
-		doNothing().when(productRepository).deleteById(10);
+//		doNothing().when(productRepository).deleteById(10);
 		
         this.mockMvc.perform(delete("/categs/*/sub/*/products/{id}", 10)
 				.contentType(MediaType.APPLICATION_JSON)

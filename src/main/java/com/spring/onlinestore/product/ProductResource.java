@@ -37,6 +37,8 @@ public class ProductResource {
 	@Autowired
 	private SubcategoryRepository subcategoryRepository;
 	
+//	private static final Logger log = LoggerFactory.getLogger(ProductResource.class);
+	
 	@JsonView(ProductView.DescriptionExcluded.class)
 	@GetMapping("/categs/*/sub/{id}/products")
 	public CollectionModel<Product> retrieveAllProducts(@PathVariable int id){
@@ -95,17 +97,21 @@ public class ProductResource {
 		
 		Optional<Product> optional2 = productRepository.findById(id2);
 		if(!optional2.isPresent()) throw new NotFoundException("Product id - " + id2);
+		Product product = optional2.get();
+		
 		prod.setId(id2);
+		prod.setShoppinglists(product.getShoppinglists());
 		
 		return productRepository.save(prod);
 	}
 	
 	@DeleteMapping("/categs/*/sub/*/products/{id}")
-	public void deleteProduct(@PathVariable int id) {
+	public ResponseEntity<String> deleteProduct(@PathVariable int id) {
 		Optional<Product> optional = productRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Product id - " + id);
-		
-		productRepository.deleteById(id);
+		Product prod = optional.get();
+		productRepository.delete(prod);
+		return ResponseEntity.ok().body("Product deleted");
 	}
 	
 }

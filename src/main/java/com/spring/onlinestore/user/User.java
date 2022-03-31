@@ -1,5 +1,8 @@
 package com.spring.onlinestore.user;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,10 +10,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.springframework.stereotype.Component;
 
 import com.spring.onlinestore.role.Role;
+import com.spring.onlinestore.shoppinglist.ShoppingList;
 
 @Entity
 @Component
@@ -27,18 +32,23 @@ public class User {
  
     @ManyToOne(fetch=FetchType.EAGER)
     private Role role;
+    
+	@OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<ShoppingList> shoppinglists;
 	
 	public User() {
 		super();
 	}
 
-	public User(Integer id, String username, String password, boolean enabled, Role role) {
+	public User(Integer id, String username, String password, boolean enabled, Role role,
+			List<ShoppingList> shoppinglists) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;
 		this.role = role;
+		this.shoppinglists = shoppinglists;
 	}
 
 	public Integer getId() {
@@ -80,5 +90,12 @@ public class User {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-	
+
+	public List<ShoppingList> getShoppinglists() {
+		return shoppinglists;
+	}
+
+	public void setShoppinglists(List<ShoppingList> shoppinglists) {
+		this.shoppinglists = shoppinglists;
+	}
 }
