@@ -3,6 +3,7 @@ package com.spring.onlinestore.shoppinglist;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,8 @@ public class ShoppingListResource {
 	public List<ShoppingList> retrieveListsForUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
-		User user = userRepository.findByUsername(currentPrincipalName).get();
+		Optional<User> optional = userRepository.findByUsername(currentPrincipalName);
+		User user = optional.get();
 		return user.getShoppinglists();
 	}
 	
@@ -52,7 +54,8 @@ public class ShoppingListResource {
 	public ResponseEntity<Object> createShoppinglist(@RequestBody ShoppingList list) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
-		User user = userRepository.findByUsername(currentPrincipalName).get();
+		Optional<User> optional = userRepository.findByUsername(currentPrincipalName);
+		User user = optional.get();
 		
 		list.setUser(user);
 		shoppinglistRepository.save(list);
@@ -65,8 +68,10 @@ public class ShoppingListResource {
 	public ShoppingList editShoppinglist(@PathVariable int id, @RequestBody ShoppingList list) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
-		User user = userRepository.findByUsername(currentPrincipalName).get();
-		ShoppingList shoppingList = shoppinglistRepository.findById(id).get();
+		Optional<User> optional = userRepository.findByUsername(currentPrincipalName);
+		User user = optional.get();
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
 		
 		list.setUser(user);
 		list.setProducts(shoppingList.getProducts());
@@ -80,7 +85,8 @@ public class ShoppingListResource {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 		
-		ShoppingList shoppingList = shoppinglistRepository.findById(id).get();
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
 		String name = shoppingList.getUser().getUsername();
 		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only delete your list(s)!");
 		
@@ -112,11 +118,13 @@ public class ShoppingListResource {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 		
-		ShoppingList shoppingList = shoppinglistRepository.findById(id).get();
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
 		String name = shoppingList.getUser().getUsername();
 		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only edit your list(s)!");
 		
-		Product product = productRepository.findById(id2).get();
+		Optional<Product> optionalp = productRepository.findById(id2);
+		Product product = optionalp.get();
 		shoppingList.getProducts().add(product);
 		shoppinglistRepository.save(shoppingList);
 		

@@ -3,6 +3,7 @@ package com.spring.onlinestore.product;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -42,7 +43,7 @@ public class Product extends RepresentationModel<Product>{
 	@JsonIgnore	
 	private Subcategory subcat;
 	
-	@ManyToMany()
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "Shopping_Product", 
             joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id") }, 
