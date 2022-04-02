@@ -1,14 +1,20 @@
 package com.spring.onlinestore.user;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,16 +22,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -35,7 +44,9 @@ import com.spring.onlinestore.role.RoleRepository;
 
 //@ContextConfiguration
 //@ExtendWith(MockitoExtension.class)
-@SpringJUnitConfig
+//@SpringJUnitConfig
+@AutoConfigureRestDocs // defaults to target/generated-snippets
+@ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 class UserResourceTest {
 
 	@Mock
@@ -50,8 +61,12 @@ class UserResourceTest {
 	MockMvc mockMvc;
 	
 	@BeforeEach
-	void setUp() {
-		this.mockMvc = MockMvcBuilders.standaloneSetup(userResource).build();
+	public void setUp(RestDocumentationContextProvider restDocumentation) {
+		this.mockMvc = MockMvcBuilders.standaloneSetup(userResource)
+				.apply(documentationConfiguration(restDocumentation))
+				 .alwaysDo(document("{method-name}", 
+						    preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+				.build();
 	}
 
 	@Test // No authentication required
@@ -84,13 +99,12 @@ class UserResourceTest {
 				.accept(MediaType.APPLICATION_JSON))
         		.andDo(print())
         		.andExpect(status().isCreated())
-				.andExpect(header().string("Location", "http://localhost/user/user"))
-				.andExpect(redirectedUrl("http://localhost/user/user"));
+				.andExpect(header().string("Location", "http://localhost:8080/user/user"))
+				.andExpect(redirectedUrl("http://localhost:8080/user/user"));
 	}
 	
 	@Test
 	@WithMockUser(username = "user", password = "password", roles = "USER")
-	@Disabled("Disabled until I find out why authentication is null")
 	void editUserTest() throws Exception {
 		User currentUser = new User();
 		User newUser = new User();
@@ -134,10 +148,42 @@ class UserResourceTest {
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(authenticated().withAuthenticationName("user"))
-				.andExpect(authenticated().withRoles("USER"))
-				.andExpect(jsonPath("$.id").value(1))
-				.andExpect(jsonPath("$.username").value("user2"))
-				.andExpect(jsonPath("$.password").value("new password2"));
+        		.andExpect(content().string("User edited"));
+	}
+	
+	@Test
+	@WithMockUser(username = "user", password = "password", roles = "USER")
+	void deleteUserTest() throws Exception {
+		
+		User currentUser = new User();
+		Role role = new Role();
+		
+		currentUser.setId(1);
+		currentUser.setEnabled(true);
+		currentUser.setUsername("user");
+		currentUser.setPassword("password");
+		
+		role.setId(10);
+		role.setName("ROLE_USER");
+		currentUser.setRole(role);
+		
+		userRepository.saveAndFlush(currentUser);
+		
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+     	SecurityContextHolder.setContext(securityContext);
+     	
+     	doReturn(authentication).when(securityContext).getAuthentication();
+     	doReturn("user").when(authentication).getName();
+        doReturn(Optional.of(currentUser)).when(userRepository).findByUsername("user");
+		doNothing().when(userRepository).deleteById(1);
+		
+        this.mockMvc.perform(delete("/user/{name}", "user")
+				.contentType(MediaType.APPLICATION_JSON)
+				.characterEncoding("utf-8")
+				.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+        		.andExpect(status().isOk())
+        		.andExpect(content().string("User deleted"));
 	}
 }

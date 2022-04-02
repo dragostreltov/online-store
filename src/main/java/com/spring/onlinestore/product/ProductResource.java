@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.spring.onlinestore.exception.NotFoundException;
+import com.spring.onlinestore.shoppinglist.ShoppingListResource;
 import com.spring.onlinestore.subcategory.Subcategory;
 import com.spring.onlinestore.subcategory.SubcategoryRepository;
 
@@ -68,7 +69,8 @@ public class ProductResource {
 		res.add(linkTo.withRel("check-similar-products"));
 		
 		// HATEOAS - add product to shopping list
-		// TO-DO
+		WebMvcLinkBuilder linkTo2 = linkTo(methodOn(ShoppingListResource.class).addProductToShoppinglist(0, id));
+		res.add(linkTo2.withRel("add-product-to-shopping-list"));
 		
 		return res;
 		

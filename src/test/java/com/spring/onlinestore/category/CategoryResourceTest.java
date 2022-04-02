@@ -3,6 +3,11 @@ package com.spring.onlinestore.category;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,14 +28,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.onlinestore.subcategory.Subcategory;
 
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureRestDocs // defaults to target/generated-snippets
+@ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
+//@SpringBootTest
 public class CategoryResourceTest {
 	
 	@Mock
@@ -42,8 +52,12 @@ public class CategoryResourceTest {
 	MockMvc mockMvc;
 	
 	@BeforeEach
-	public void setUp() {
-		this.mockMvc = MockMvcBuilders.standaloneSetup(categoryResource).build();
+	public void setUp(RestDocumentationContextProvider restDocumentation) {
+		this.mockMvc = MockMvcBuilders.standaloneSetup(categoryResource)
+				.apply(documentationConfiguration(restDocumentation))
+				 .alwaysDo(document("{method-name}", 
+						    preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+				.build();
 	}
 	
 	@Test
@@ -82,8 +96,8 @@ public class CategoryResourceTest {
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", "http://localhost/categs/1"))
-				.andExpect(redirectedUrl("http://localhost/categs/1"));
+				.andExpect(header().string("Location", "http://localhost:8080/categs/1"))
+				.andExpect(redirectedUrl("http://localhost:8080/categs/1"));
 	}
 	
 	@Test

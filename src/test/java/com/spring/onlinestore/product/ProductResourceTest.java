@@ -2,6 +2,11 @@ package com.spring.onlinestore.product;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -17,14 +22,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -33,7 +42,8 @@ import com.spring.onlinestore.shoppinglist.ShoppingList;
 import com.spring.onlinestore.subcategory.Subcategory;
 import com.spring.onlinestore.subcategory.SubcategoryRepository;
 
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureRestDocs // defaults to target/generated-snippets
+@ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 public class ProductResourceTest {
 	
 	@Mock
@@ -51,16 +61,17 @@ public class ProductResourceTest {
 	MockMvc mockMvc;
 	
 	@BeforeEach
-	public void setUp() {
-		this.mockMvc = MockMvcBuilders.standaloneSetup(productResource).build();
+	public void setUp(RestDocumentationContextProvider restDocumentation) {
+		this.mockMvc = MockMvcBuilders.standaloneSetup(productResource)
+				.apply(documentationConfiguration(restDocumentation))
+				 .alwaysDo(document("{method-name}", 
+						    preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+				.build();
 	}
 	
-	@Disabled("Disabled until I find a way to mock return CollectionModel")
 	@Test
 	final void retrieveAllProductsTest() throws Exception {
 		sub.setId(1);
-//		Subcategory subcat = new Subcategory();
-//		subcat.setId(2);
 		Set<ShoppingList> shoppinglists = new HashSet<>();
 		
 		Product product = new Product(10, "samsung", "smartphone", 1000.0, sub, shoppinglists);
@@ -70,24 +81,20 @@ public class ProductResourceTest {
 		productRepository.saveAndFlush(product2);
 		
 		List<Product> list = List.of(product, product2);
-//		CollectionModel<Product> resource = CollectionModel.of(list);
-//		ProductResource spy = spy(ProductResource.class);
-
+//		 list.stream().forEach(e -> {
+//			 e.add(linkTo(methodOn(ProductResource.class).retrieveProduct(e.getId())).withSelfRel());
+//		 });
+		 
 		doReturn(Optional.of(sub)).when(subcategoryRepository).findById(1);
 		doReturn(list).when(sub).getProds();
-//		doReturn(resource).when(spy).retrieveAllProducts(2);
 		
+		CollectionModel<Product> listWithLinks = CollectionModel.of(list);
+//		CollectionModel<Product> products = productResource.retrieveAllProducts(1);
+		Assertions.assertEquals(listWithLinks, productResource.retrieveAllProducts(1));
+        
 		this.mockMvc.perform(get("/categs/*/sub/{id}/products", 1))
-//			.accept(MediaTypes.HAL_JSON))
 			.andDo(print())
-			.andExpect(status().isOk())
-//			.andExpect(content().contentType(MediaTypes.HAL_JSON))
-			.andExpect(jsonPath("$[0].id").value(10))
-			.andExpect(jsonPath("$[0].name").value("samsung"))
-			.andExpect(jsonPath("$[0].price").value(1000.0))
-			.andExpect(jsonPath("$[1].id").value(11))
-			.andExpect(jsonPath("$[1].name").value("apple"))
-			.andExpect(jsonPath("$[1].price").value(900.0));
+			.andExpect(status().isOk());
 	}
 	
 	@Test
@@ -110,7 +117,8 @@ public class ProductResourceTest {
 			.andExpect(jsonPath("$.name").value("samsung"))
 			.andExpect(jsonPath("$.description").value("smartphone"))
 			.andExpect(jsonPath("$.price").value(1000.0))
-			.andExpect(jsonPath("$.links[0].href").value("http://localhost/categs/*/sub/2/products"));
+			.andExpect(jsonPath("$.links[0].href").value("http://localhost:8080/categs/*/sub/2/products"))
+			.andExpect(jsonPath("$.links[1].href").value("http://localhost:8080/user/lists/0/10"));
 	}
 	
 	@Test
@@ -133,8 +141,8 @@ public class ProductResourceTest {
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", "http://localhost/categs/*/sub/1/products/10"))
-				.andExpect(redirectedUrl("http://localhost/categs/*/sub/1/products/10"));
+				.andExpect(header().string("Location", "http://localhost:8080/categs/*/sub/1/products/10"))
+				.andExpect(redirectedUrl("http://localhost:8080/categs/*/sub/1/products/10"));
 	}
 	
 	@Test

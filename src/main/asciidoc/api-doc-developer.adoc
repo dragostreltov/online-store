@@ -1,0 +1,607 @@
+= *Online Shop REST API Documentation - Internal*
+Dragos Streltov
+:toc:
+
+== *Notes for Developers*
+
+=== *Regarding the use of project*
+
+If you wish to clone/fork and work on the project, you can use/test any feature using the *admin* account for authentication:
+....
+username: admin
+password: admin
+....
+Same credentials can be used for access inside the database:
+....
+H2 console
+http://localhost:8080/h2-console/
+....
+
+The consumer documentation includes only features that can be accessed by users with "ROLE_USER".
+Those features were imported in this document. Furthermore, all the API's features are explained here. 
+Using the API's registration feature you can only create accounts with "ROLE_USER". If you need additional "ROLE_ADMIN" users, you can create via SQL query inside _/online-store/src/main/resources/data.sql_, table USER.
+
+=== *Regarding documentation snippets*
+
+The snippets used inside the documentation are auto updated by their respective *unit tests*.
+
+In order to generate snippets from a new device (cloned/forked project), you have to run all unit tests. Then you'll find the snippets at _/online-store/target/generated-snippets_.
+The source document for generating .html docs must be placed inside  _/online-store/src/main/asciidoc_ with .adoc format. This is where I wrote the whole documentation and organized snippets.
+To generate the .html document, you must run "mvn package" or Run as -> Maven build... -> Goals: package
+
+Some of the _consumer related_ routes/features have custom snippets with suffix "-consumer", which are *NOT* auto updated (I created them on my machine and are ignored by git).
+This is because some details/parameters used for executing methods must be hidden from the consumer, and the auto generated snippets contain all the used parameters.
+
+=== *Regarding API calls*
+
+All the admin features displayed here use the default "-test" snippets, so please take into consideration the following when performing API calls:
+
+When sending *POST* requests, Hibernate auto-assigns an ID and other needed empty/null parameters to the created object (to pass the constructor), so you don't need to specify them inside API request body.
+
+When sending *PUT* requests, the methods are implemented to conserve all the unchanged details of the edited object, so you don't need to specify all of them.
+
+Example for user registration:
+
+include::{snippets}/register-test/curl-request.adoc[]
+
+This is what the service receives at the end, but all input (except user and password) is auto-assigned.
+
+Example for subcategory creation:
+
+include::{snippets}/create-subcategory-test/curl-request.adoc[]
+
+The object always gets assigned an empty list of products, to pass the constructor. You can add the products too, if you want, but I recommend using the existing service for this. 
+
+== *Getting started*
+
+This document explains how to successfully call the Online Shop API with your app/browser. It assumes you are familiar with API usage and know how to perform REST API calls.
+
+=== *Before you start*
+
+You will need an user account in order to get access to the API's features.
+
+=== *User registration*
+
+In order to create an account, you will access the user registration path:
+
+....
+http://localhost:8080/user
+....
+
+Required fields:
+....
+username: {user}
+password: {password}
+....
+
+Example request of account creation for a user with:
+
+operation::register-test-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
+|===
+
+=== *User authentication*
+
+Online Shop supports HTTP Basic authentication. This allows you to protect the URLs so that only you and Online Shop can access them. In order to authenticate with HTTP, you may provide a username and password with the following format:
+
+Using cURL:
+....
+curl -u USERNAME:[password] ...
+....
+
+Example request:
+....
+curl -u test_user:test_pwd 'http://localhost:8080/categs' -i -X GET
+
+HTTP/1.1 200 
+Set-Cookie: JSESSIONID=D14B20D8F816234C194296B5CEAC9DAA; Path=/; HttpOnly
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 02 Apr 2022 09:16:04 GMT
+
+[{"id":101,"name":"Telefoane, Tablete"},{"id":102,"name":"Gaming, Jocuri"}]
+....
+
+Using any API testing application, before sending any request:
+
+....
+Authorization -> Type: Basic Auth
+....
+
+== *Exploring the APIs*
+
+All the products under the shop are sorted by categories and subcategories, which any registered user will navigate through in order to check a product. Then, if the user wants to purchase said product, it can be added in a shopping list. The user can manage multiple lists.
+
+== *Store related APIs*
+
+=== *Retrieve all categories*
+
+Returns all categories of products.
+
+....
+GET http://localhost:8080/categs
+....
+
+Example request:
+
+operation::retrieve-all-categories-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+=== *Retrieve all subcategories*
+
+Returns all subcategories of products.
+
+....
+GET http://localhost:8080/categs/{id}/sub
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the category
+|===
+
+Example request:
+
+operation::retrieve-all-subcategories-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+=== *Retrieve all products*
+
+Returns all products under a certain subcategory.
+
+....
+GET http://localhost:8080/categs/*/sub/{id}/products
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the parent subcategory
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Example request:
+
+operation::retrieve-all-products-consumer[snippets='curl-request,http-request,http-response']
+
+Each product has a link for quick access to "retrieve a product" API call.
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+=== *Retrieve a product*
+
+Returns a specified product.
+
+....
+GET http://localhost:8080/categs/*/sub/*/products/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the product
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Example request:
+
+operation::retrieve-product-test[snippets='curl-request,http-request,http-response']
+
+Each product is returned with a list of useful links:
+
+[cols="2,5"]
+|===
+|Tag |Description
+
+|check-similar-products
+|Redirects the user to API call for retrieving all products under the same category
+
+|add-product-to-shopping-list
+|Redirects the user to API call for adding the product to a specified shopping list (replace "0" with the ID of the desired shopping list)
+|===
+
+Possible errors:
+
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+
+== *User related APIs*
+
+=== *Edit current user*
+
+Updates the user info and returns confirmation.
+
+....
+PUT http://localhost:8080/user/{name}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Current name of the user to be edited
+|===
+
+Required fields:
+
+....
+{
+	username: {username},
+	password: {password}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|username
+|String
+|New name for the edited user (use the current name if not desired to be changed)
+
+|password
+|String
+|New password for the edited user (use the current password if not desired to be changed)
+|===
+
+Example request:
+
+operation::edit-user-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _name_ in request path doesn't point to a user account that the authenticated user can edit
+
+|400 Bad Request
+|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
+|===
+
+=== *Delete user*
+
+Deletes the selected (and current) user and returns confirmation.
+
+....
+DELETE http://localhost:8080/user/{name}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Name of the user to be deleted
+|===
+
+Example request:
+
+operation::delete-user-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _name_ in request path doesn't point to a user account that the authenticated user can delete
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+|===
+
+=== *Retrieve all shopping lists for current user*
+
+Returns all existing shopping lists for current authenticated user.
+
+....
+GET http://localhost:8080/user/lists
+....
+
+Example request:
+
+operation::retrieve-lists-for-user-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+
+=== *Create shopping list*
+
+Creates a shopping list and returns confirmation.
+
+....
+POST http://localhost:8080/user/lists
+....
+
+Required fields:
+
+....
+{
+	name: {list_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Chosen name for the shopping list to be created
+|===
+
+Example request:
+
+operation::create-shoppinglist-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|400 Bad Request
+|Required fields were invalid or not specified
+|===
+
+=== *Edit a shopping list*
+
+Updates the shopping list details and returns confirmation.
+
+....
+PUT http://localhost:8080/user/lists/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list to be edited
+|===
+
+Required fields:
+
+....
+{
+	name: {list_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|New name for the edited shopping list (use the current name if not desired to be changed)
+|===
+
+Example request:
+
+operation::edit-shoppinglist-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+|===
+
+=== *Delete a shopping list*
+
+Deletes the shopping list and returns confirmation.
+
+....
+DELETE http://localhost:8080/user/lists/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list to be deleted
+|===
+
+Example request:
+
+operation::delete-shoppinglist-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can delete
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+|===
+
+
+=== *Retrieve products in a shopping list*
+
+Returns the products from the selected shopping list.
+
+....
+GET http://localhost:8080/user/lists/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list to be displayed
+|===
+
+Example request:
+
+operation::get-shoppinglist-products-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can check
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+|===
+
+=== *Add a product to a shopping list*
+
+Adds a product to a specified list and returns confirmation.
+
+....
+POST http://localhost:8080/user/lists/{id}/{id2}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the desired list
+
+|id2
+|int
+|ID of the product to be added
+|===
+
+Example request:
+
+operation::add-product-to-shoppinglist-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+|===
+
+=== *Delete a product from a shopping list*
