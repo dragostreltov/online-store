@@ -14,8 +14,14 @@ Online shopping with shopping lists management
   - Open /online-store/src/main/java/com/spring/onlinestore/OnlineStoreApplication.java
   - Run as "Java Application"
  
+## REST API Documentation
+The documentation is now available in two versions:
+- Consumer:
+  - api-doc-consumer.html
+- Developer:
+  - api-doc-developer.html
 
-## REST API Request Mapping
+## REST API Request Mapping (will be removed when api-doc-developer.html is finished)
 Default request URL: http://localhost:8080
 
 Register user: 
