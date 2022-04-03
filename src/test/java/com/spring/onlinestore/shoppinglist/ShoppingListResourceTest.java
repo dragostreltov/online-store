@@ -293,8 +293,7 @@ class ShoppingListResourceTest {
      	doReturn("user").when(currentUser).getUsername();
      	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
      	doReturn(Optional.of(product)).when(productRepository).findById(101);
-     	doReturn(products).when(list).getProducts();
-     	doReturn(true).when(products).add(product2);
+     	doNothing().when(list).addProduct(product2);
      	doReturn(list).when(shoppinglistRepository).save(any());
      	
         this.mockMvc.perform(post("/user/lists/{id}/{id2}", 10, 101)
@@ -331,8 +330,7 @@ class ShoppingListResourceTest {
      	doReturn("user").when(currentUser).getUsername();
      	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
      	doReturn(Optional.of(product)).when(productRepository).findById(100);
-     	doReturn(products).when(list).getProducts();
-     	doReturn(true).when(products).remove(product);
+     	doNothing().when(list).removeProduct(product);
      	doReturn(list).when(shoppinglistRepository).save(any());
      	
         this.mockMvc.perform(delete("/user/lists/{id}/{id2}", 10, 100)

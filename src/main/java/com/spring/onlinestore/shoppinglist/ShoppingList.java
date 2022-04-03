@@ -3,7 +3,6 @@ package com.spring.onlinestore.shoppinglist;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -22,7 +21,7 @@ import com.spring.onlinestore.user.User;
 @Entity
 @Component
 public class ShoppingList {
-
+	
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 	@JsonView(ShoppingListView.ProductsExcluded.class)
@@ -32,7 +31,7 @@ public class ShoppingList {
     private String name;
     
 	@JsonView(ShoppingListView.ProductsIncluded.class)
-	@ManyToMany(mappedBy = "shoppinglists", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(mappedBy = "shoppinglists")//, fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
 	private Set<Product> products = new HashSet<>();
     
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -82,4 +81,14 @@ public class ShoppingList {
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
+    public void addProduct(Product product) {
+    	this.products.add(product);
+    	product.getShoppinglists().add(this);
+    }
+    
+    public void removeProduct(Product product) {
+    	this.products.remove(product);
+    	product.getShoppinglists().remove(this);
+    }
 }

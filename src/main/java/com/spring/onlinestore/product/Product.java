@@ -43,11 +43,11 @@ public class Product extends RepresentationModel<Product>{
 	@JsonIgnore	
 	private Subcategory subcat;
 	
-	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(
             name = "Shopping_Product", 
-            joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id") }, 
-            inverseJoinColumns = { @JoinColumn(name = "list_id", referencedColumnName = "list_id") })
+            joinColumns = { @JoinColumn(name = "id") }, 
+            inverseJoinColumns = { @JoinColumn(name = "list_id") })
 	@JsonIgnore
     private Set<ShoppingList> shoppinglists = new HashSet<>();
 	
@@ -115,6 +115,16 @@ public class Product extends RepresentationModel<Product>{
 		this.shoppinglists = shoppinglists;
 	}
 
+    public void addShoppinglist(ShoppingList list) {
+    	this.shoppinglists.add(list);
+    	list.getProducts().add(this);
+    }
+	
+    public void removeShoppinglist(ShoppingList list) {
+    	this.shoppinglists.remove(list);
+    	list.getProducts().remove(this);
+    }
+    
 	@Override
 	public String toString() {
 		return String.format("Product [id=%s, name=%s, description=%s, price=%s]", id, name, description, price);

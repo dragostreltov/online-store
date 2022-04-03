@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -80,6 +82,7 @@ public class ShoppingListResource {
 		return shoppinglistRepository.save(list);
 	}
 	
+	@Transactional
 	@DeleteMapping("/user/lists/{id}")
 	public ResponseEntity<String> deleteShoppinglist(@PathVariable int id) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -89,12 +92,16 @@ public class ShoppingListResource {
 		ShoppingList shoppingList = optional2.get();
 		String name = shoppingList.getUser().getUsername();
 		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only delete your list(s)!");
-		
-		shoppinglistRepository.delete(shoppingList);	
+
+		shoppingList.getProducts().stream().forEach(e -> {
+			e.removeShoppinglist(shoppingList);
+		});
+		shoppinglistRepository.delete(shoppingList);
 		
 		return ResponseEntity.ok().body("Shopping list deleted");
 	}
 	
+	@Transactional
 	@GetMapping("/user/lists/{id}")
 	public Set<Product> getShoppinglistProducts(@PathVariable int id) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -125,7 +132,7 @@ public class ShoppingListResource {
 		
 		Optional<Product> optionalp = productRepository.findById(id2);
 		Product product = optionalp.get();
-		shoppingList.getProducts().add(product);
+		shoppingList.addProduct(product);
 		shoppinglistRepository.save(shoppingList);
 		
 		return ResponseEntity.created(null).body("Product added to list");
@@ -143,7 +150,7 @@ public class ShoppingListResource {
 		
 		Optional<Product> optionalp = productRepository.findById(id2);
 		Product product = optionalp.get();
-		shoppingList.getProducts().remove(product);
+		shoppingList.removeProduct(product);
 		shoppinglistRepository.save(shoppingList);
 		
 		return ResponseEntity.ok().body("Product deleted from list");
