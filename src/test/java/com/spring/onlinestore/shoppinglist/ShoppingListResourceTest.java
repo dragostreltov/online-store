@@ -306,5 +306,42 @@ class ShoppingListResourceTest {
         		.andExpect(status().isCreated())
         		.andExpect(content().string("Product added to list"));
 	}
+	
+	@Test
+	void deleteProductFromShoppinglistTest() throws Exception {
+		
+		currentUser.setId(1);
+		list.setUser(currentUser);
+		list.setList_id(10);
+		list.setName("whishlist");
+		Product product = new Product();
+		product.setId(100);
+		product.setName("samsung");
+		product.setDescription("smartphone");
+		product.setPrice(1000.0);
+		products.add(product);
+		
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+     	SecurityContextHolder.setContext(securityContext);
+     	
+     	doReturn(authentication).when(securityContext).getAuthentication();
+     	doReturn("user").when(authentication).getName();
+     	doReturn(currentUser).when(list).getUser();
+     	doReturn("user").when(currentUser).getUsername();
+     	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
+     	doReturn(Optional.of(product)).when(productRepository).findById(100);
+     	doReturn(products).when(list).getProducts();
+     	doReturn(true).when(products).remove(product);
+     	doReturn(list).when(shoppinglistRepository).save(any());
+     	
+        this.mockMvc.perform(delete("/user/lists/{id}/{id2}", 10, 100)
+				.contentType(MediaType.APPLICATION_JSON)
+				.characterEncoding("utf-8")
+				.accept(MediaType.APPLICATION_JSON))
+        		.andDo(print())
+        		.andExpect(status().isOk())
+        		.andExpect(content().string("Product deleted from list"));
+	}
 
 }

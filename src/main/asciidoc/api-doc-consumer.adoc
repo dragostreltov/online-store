@@ -555,3 +555,42 @@ Possible errors:
 |===
 
 === *Delete a product from a shopping list*
+
+Deletes a product from a specified list and returns confirmation.
+
+....
+DELETE http://localhost:8080/user/lists/{id}/{id2}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the desired list
+
+|id2
+|int
+|ID of the product to be deleted
+|===
+
+Example request:
+
+operation::delete-product-from-shoppinglist-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+|===

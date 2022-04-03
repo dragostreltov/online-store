@@ -131,4 +131,22 @@ public class ShoppingListResource {
 		return ResponseEntity.created(null).body("Product added to list");
 	}
 	
+	@DeleteMapping("/user/lists/{id}/{id2}")
+	public ResponseEntity<String> deleteProductFromShoppinglist(@PathVariable int id, @PathVariable int id2) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
+		
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
+		String name = shoppingList.getUser().getUsername();
+		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only edit your list(s)!");
+		
+		Optional<Product> optionalp = productRepository.findById(id2);
+		Product product = optionalp.get();
+		shoppingList.getProducts().remove(product);
+		shoppinglistRepository.save(shoppingList);
+		
+		return ResponseEntity.ok().body("Product deleted from list");
+	}
+	
 }

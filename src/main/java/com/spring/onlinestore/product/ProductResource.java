@@ -90,7 +90,7 @@ public class ProductResource {
 	}
 	
 	@PutMapping("/categs/*/sub/{id}/products/{id2}")
-	public Product editProduct(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Product prod) {
+	public ResponseEntity<String> editProduct(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Product prod) {
 		Optional<Subcategory> optional = subcategoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Subcategory id - " + id);
 		
@@ -104,7 +104,8 @@ public class ProductResource {
 		prod.setId(id2);
 		prod.setShoppinglists(product.getShoppinglists());
 		
-		return productRepository.save(prod);
+		productRepository.save(prod);
+		return ResponseEntity.ok().body("Product edited");
 	}
 	
 	@DeleteMapping("/categs/*/sub/*/products/{id}")

@@ -147,6 +147,144 @@ Possible errors:
 |The credentials are invalid
 |===
 
+=== *Create a category*
+
+Creates a category and returns the result.
+
+....
+POST http://localhost:8080/categs
+....
+
+Required fields:
+....
+{
+	name: {category_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Chosen name for the category to be created
+|===
+
+Example request:
+
+operation::create-category-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+=== *Edit a category*
+
+Modifies a selected category and returns the result.
+
+....
+PUT http://localhost:8080/categs/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the category to be edited
+|===
+
+Required fields:
+....
+{
+	name: {category_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|New name for the edited category (use the current name if not desired to be changed)
+|===
+
+Example request:
+
+operation::edit-category-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+=== *Delete a category*
+
+Deletes a category and returns confirmation.
+
+_Note: All entities under the selected category will be deleted too!_
+
+....
+DELETE http://localhost:8080/categs/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the category to be deleted
+|===
+
+Example request:
+
+operation::delete-category-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+
 === *Retrieve all subcategories*
 
 Returns all subcategories of products.
@@ -162,7 +300,7 @@ Where:
 
 |id
 |int
-|ID of the category
+|ID of the parent category
 |===
 
 Example request:
@@ -180,6 +318,162 @@ Possible errors:
 |401 Unauthorized
 |The credentials are invalid
 |===
+
+
+=== *Create a subcategory*
+
+Creates a subcategory and returns the result.
+
+....
+POST http://localhost:8080/categs/{id}/sub
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the parent category
+|===
+
+Required fields:
+....
+{
+	name: {subcategory_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Chosen name for the subcategory to be created
+|===
+
+Example request:
+
+operation::create-subcategory-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+=== *Edit a subcategory*
+
+Edits a category and returns the result.
+
+....
+PUT http://localhost:8080/categs/{id}/sub/{id2}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the parent category
+
+|id2
+|int
+|ID of the subcategory to be edited
+|===
+
+Required fields:
+....
+{
+	name: {subcategory_name}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|New name for the edited subcategory (use the current name if not desired to be changed)
+|===
+
+Example request:
+
+operation::edit-subcategory-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+
+=== *Delete a subcategory*
+
+Deletes a subcategory and returns confirmation.
+
+_Note: All entities under the selected subcategory will be deleted too!_
+
+....
+DELETE http://localhost:8080/categs/*/sub/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the subcategory to be deleted
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Example request:
+
+operation::delete-subcategory-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
 
 === *Retrieve all products*
 
@@ -269,6 +563,183 @@ Possible errors:
 |The credentials are invalid
 |===
 
+=== *Create a product*
+
+Creates a product and returns the result.
+
+....
+POST http://localhost:8080/categs/*/sub/{id}/products
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the parent subcategory
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Required fields:
+....
+{
+    "name" : {product_name},
+	 "description" : {product_description},
+	 "price" : {product_price}
+}	
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|Chosen name for the product to be created
+
+|description
+|String
+|Details regarding the product to be created (ex. specifications)
+
+|price
+|double
+|Price for the product to be created
+|===
+ 
+Example request:
+
+operation::create-product-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+
+=== *Edit a product*
+
+Edits a category and returns confirmation.
+
+....
+PUT http://localhost:8080/categs/*/sub/{id}/products/{id2}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the parent subcategory
+
+|id2
+|int
+|ID of the product to be edited
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Required fields:
+....
+{
+    "name" : {product_name},
+	 "description" : {product_description},
+	 "price" : {product_price}
+}	
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|name
+|String
+|New name for the edited product (use the current name if not desired to be changed)
+
+|description
+|String
+|New description for the edited product (use the current name if not desired to be changed)
+
+|price
+|double
+|New price for the edited product (use the current name if not desired to be changed)
+|===
+
+operation::edit-product-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+
+=== *Delete a product*
+
+Deletes a product and returns confirmation.
+
+_Note: The product will be deleted from all existing shopping lists (as intended)._
+
+....
+DELETE http://localhost:8080/categs/*/sub/*/products/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the product to be deleted
+|===
+
+_Note: * is a wildcard for "any", meaning the server doesn't take that input into consideration, for easier navigation._
+
+Example request:
+
+operation::delete-product-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
 
 == *User related APIs*
 
@@ -322,14 +793,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _name_ in request path doesn't point to a user account that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
 |===
 
 === *Delete user*
@@ -359,14 +830,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _name_ in request path doesn't point to a user account that the authenticated user can delete
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Retrieve all shopping lists for current user*
@@ -426,11 +897,11 @@ Possible errors:
 |===
 |Error code |Description
 
-|401 Unauthorized
-|The credentials are invalid
-
 |400 Bad Request
 |Required fields were invalid or not specified
+
+|401 Unauthorized
+|The credentials are invalid
 |===
 
 === *Edit a shopping list*
@@ -478,14 +949,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Delete a shopping list*
@@ -515,14 +986,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can delete
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 
@@ -553,14 +1024,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can check
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Add a product to a shopping list*
@@ -594,14 +1065,53 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Delete a product from a shopping list*
+
+Deletes a product from a specified list and returns confirmation.
+
+....
+DELETE http://localhost:8080/user/lists/{id}/{id2}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the desired list
+
+|id2
+|int
+|ID of the product to be deleted
+|===
+
+Example request:
+
+operation::delete-product-from-shoppinglist-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+|===
