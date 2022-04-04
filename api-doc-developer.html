@@ -1880,7 +1880,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 327
+Content-Length: 417
 
 {
   "id" : 10,
@@ -1893,6 +1893,9 @@ Content-Length: 327
   }, {
     "rel" : "add-product-to-shopping-list",
     "href" : "http://localhost:8080/user/lists/0/10"
+  }, {
+    "rel" : "check-your-lists",
+    "href" : "http://localhost:8080/user/lists"
   } ]
 }</code></pre>
 </div>
@@ -1920,6 +1923,10 @@ Content-Length: 327
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">add-product-to-shopping-list</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Redirects the user to API call for adding the product to a specified shopping list (replace "0" with the ID of the desired shopping list)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">check-your-lists</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redirects the user to API call for retrieving all user&#8217;s existing lists</p></td>
 </tr>
 </tbody>
 </table>
@@ -3122,13 +3129,19 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 117
+Content-Length: 231
 
 [ {
   "id" : 100,
   "name" : "samsung",
   "description" : "smartphone",
   "price" : 1000.0,
+  "links" : [ ]
+}, {
+  "id" : 101,
+  "name" : "apple",
+  "description" : "smartphone2",
+  "price" : 1100.0,
   "links" : [ ]
 } ]</code></pre>
 </div>
@@ -3375,7 +3388,7 @@ Product deleted from list</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-03 15:38:53 +0300
+Last updated 2022-04-04 19:22:26 +0300
 </div>
 </div>
 </body>

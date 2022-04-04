@@ -72,8 +72,11 @@ public class ProductResource {
 		WebMvcLinkBuilder linkTo2 = linkTo(methodOn(ShoppingListResource.class).addProductToShoppinglist(0, id));
 		res.add(linkTo2.withRel("add-product-to-shopping-list"));
 		
-		return res;
+		// HATEOAS - check your lists
+		WebMvcLinkBuilder linkTo3 = linkTo(methodOn(ShoppingListResource.class).retrieveListsForUser());
+		res.add(linkTo3.withRel("check-your-lists"));
 		
+		return res;
 	}
 	
 	@PostMapping("/categs/*/sub/{id}/products")

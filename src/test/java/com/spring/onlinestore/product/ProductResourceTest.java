@@ -119,7 +119,8 @@ public class ProductResourceTest {
 			.andExpect(jsonPath("$.description").value("smartphone"))
 			.andExpect(jsonPath("$.price").value(1000.0))
 			.andExpect(jsonPath("$.links[0].href").value("http://localhost:8080/categs/*/sub/2/products"))
-			.andExpect(jsonPath("$.links[1].href").value("http://localhost:8080/user/lists/0/10"));
+			.andExpect(jsonPath("$.links[1].href").value("http://localhost:8080/user/lists/0/10"))
+			.andExpect(jsonPath("$.links[2].href").value("http://localhost:8080/user/lists"));
 	}
 	
 	@Test

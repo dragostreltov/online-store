@@ -548,6 +548,9 @@ Each product is returned with a list of useful links:
 
 |add-product-to-shopping-list
 |Redirects the user to API call for adding the product to a specified shopping list (replace "0" with the ID of the desired shopping list)
+
+|check-your-lists
+|Redirects the user to API call for retrieving all user's existing lists 
 |===
 
 Possible errors:
