@@ -1,6 +1,7 @@
 package com.spring.onlinestore.product;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -125,6 +126,28 @@ public class Product extends RepresentationModel<Product>{
     	list.getProducts().remove(this);
     }
     
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(description, id, name, price, shoppinglists, subcat);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof Product))
+			return false;
+		Product other = (Product) obj;
+		return Objects.equals(description, other.description) && Objects.equals(id, other.id)
+				&& Objects.equals(name, other.name) && Objects.equals(price, other.price)
+				&& Objects.equals(shoppinglists, other.shoppinglists) && Objects.equals(subcat, other.subcat);
+	}
+
 	@Override
 	public String toString() {
 		return String.format("Product [id=%s, name=%s, description=%s, price=%s]", id, name, description, price);

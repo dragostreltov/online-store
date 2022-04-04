@@ -40,8 +40,6 @@ public class ShoppingListResource {
 	@Autowired
 	private ShoppingListRepository shoppinglistRepository;
 	
-//	private static final Logger log = LoggerFactory.getLogger(ShoppingListResource.class);
-	
 	@JsonView(ShoppingListView.ProductsExcluded.class)
 	@GetMapping("/user/lists")
 	public List<ShoppingList> retrieveListsForUser() {
@@ -111,12 +109,6 @@ public class ShoppingListResource {
 		String name = shoppingList.getUser().getUsername();
 		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only check your list(s)!");
 
-//		All lists are shown for a product
-//		Product p = productRepository.findById(10111).get();
-//		Set<ShoppingList> set = p.getShoppinglists();
-//		set.stream().forEach(e -> log.info(e.toString()));
-		
-//		Only first product is shown for a list
 		return shoppingList.getProducts();
 	}
 	

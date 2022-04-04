@@ -211,7 +211,6 @@ class ShoppingListResourceTest {
 	}
 	
 	@Test
-//	@Disabled("Until fix is found for: Hibernate only retrieves the first product from list")
 	void getShoppinglistProductsTest() throws Exception {
 		
 		currentUser.setId(1);
@@ -249,11 +248,11 @@ class ShoppingListResourceTest {
 				.andExpect(jsonPath("$[0].id").value(100))
 				.andExpect(jsonPath("$[0].name").value("samsung"))
 				.andExpect(jsonPath("$[0].description").value("smartphone"))
-				.andExpect(jsonPath("$[0].price").value(1000.0));
-//				.andExpect(jsonPath("$[1].id").value(101))
-//				.andExpect(jsonPath("$[1].name").value("apple"))
-//				.andExpect(jsonPath("$[1].description").value("new smartphone"))
-//				.andExpect(jsonPath("$[1].price").value(1100.0));
+				.andExpect(jsonPath("$[0].price").value(1000.0))
+				.andExpect(jsonPath("$[1].id").value(101))
+				.andExpect(jsonPath("$[1].name").value("apple"))
+				.andExpect(jsonPath("$[1].description").value("smartphone2"))
+				.andExpect(jsonPath("$[1].price").value(1100.0));
 	}
 	
 	@Test
