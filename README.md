@@ -3,7 +3,7 @@ Secured online b2b electronics store
 
 This application expects basic authentication for using its features. Authorization is based on user roles (admin, user etc.).
 
-All the shop's products are sorted by categories and subcategories, which any authenticated and authorized user will navigate through in order to check products. If the user wants to purchase a product, it can be added to a shopping list. 
+All the shop's products are sorted by categories and subcategories, which any authenticated and authorized user will navigate through in order to check them. If the user wants to purchase a product, it can be added to a shopping list. 
 
 The user can create and manage multiple lists (wishlists). When a shopping list is finished, the user can proceed to the checkout page, which displays the total cost and offers the possibility of applying a discount coupon (if any are available).
 
