@@ -322,6 +322,8 @@ Possible errors:
 |Required fields were invalid or not specified 
 |===
 
+== *Shopping List related APIs*
+
 === *Retrieve all shopping lists for current user*
 
 Returns all existing shopping lists for current authenticated user.
@@ -596,4 +598,130 @@ Possible errors:
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+|===
+
+=== *Checkout shopping list*
+
+Sets a shopping list for checkout, returns total cost and notifies user about the possibility of applying a discount coupon.
+
+....
+GET http://localhost:8080/user/lists/{id}/checkout
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list
+|===
+
+Example request:
+
+operation::shoppinglist-checkout-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can checkout
+|===
+
+=== *Retrieve all active discount coupons*
+
+Retrieves all active discount coupons.
+
+....
+GET http://localhost:8080/coupons
+....
+
+Example request:
+
+operation::retrieve-all-coupons-test[snippets='curl-request,http-request,http-response']
+
+_Notes:_ 
+
+- _If percentage > 1, the coupon offers a flat reduction!_
+....
+percentage = 100.0 -> totalCost - 100.0
+....
+- _If percentage < 1, the coupon offers a percentage reduction!_
+....
+percentage = 0.85 -> totalCost - 15%
+....
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+=== *Apply discount coupon to shopping list*
+
+Applies discount coupon to shopping list and returns the modified total cost.
+
+....
+POST http://localhost:8080/user/lists/{id}/checkout
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list
+|===
+
+Required fields:
+....
+{
+	code: {coupon_code}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|code
+|String
+|Coupon code of the coupon to be applied
+|===
+
+Example request:
+
+operation::apply-discount-coupon-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can checkout
 |===

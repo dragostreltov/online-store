@@ -191,6 +191,7 @@ public class ProductResourceTest {
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-        		.andExpect(status().isOk());
+        		.andExpect(status().isOk())
+        		.andExpect(content().string("Product deleted"));
 	}
 }

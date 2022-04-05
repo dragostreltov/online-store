@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -140,6 +141,7 @@ public class CategoryResourceTest {
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-        		.andExpect(status().isOk());
+        		.andExpect(status().isOk())
+        		.andExpect(content().string("Category deleted"));
 	}
 }

@@ -26,7 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +46,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring.onlinestore.coupon.Coupon;
+import com.spring.onlinestore.coupon.CouponRepository;
 import com.spring.onlinestore.product.Product;
 import com.spring.onlinestore.product.ProductRepository;
 import com.spring.onlinestore.user.User;
@@ -71,6 +75,9 @@ class ShoppingListResourceTest {
 	@Mock
 	private ShoppingListRepository shoppinglistRepository;
 	
+	@Mock
+	private CouponRepository couponRepository;
+	
 	@InjectMocks
 	ShoppingListResource shoppinglistResource;
 	
@@ -92,7 +99,7 @@ class ShoppingListResourceTest {
 		currentUser.setId(1);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		shoppinglistRepository.saveAndFlush(list);
 		
 		List<ShoppingList> lists = new ArrayList<>();		
@@ -111,7 +118,7 @@ class ShoppingListResourceTest {
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].list_id").value(10))
-				.andExpect(jsonPath("$[0].name").value("whishlist"));
+				.andExpect(jsonPath("$[0].name").value("wishlist"));
 	}
 	
 	@Test
@@ -121,7 +128,7 @@ class ShoppingListResourceTest {
 		currentUser.setId(1);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -157,7 +164,7 @@ class ShoppingListResourceTest {
 		shoppinglistRepository.saveAndFlush(oldlist);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist_modified");
+		list.setName("wishlist_modified");
 		
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -179,7 +186,7 @@ class ShoppingListResourceTest {
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.list_id").value(10))
-				.andExpect(jsonPath("$.name").value("whishlist_modified"));
+				.andExpect(jsonPath("$.name").value("wishlist_modified"));
 	}
 	
 	@Test
@@ -189,7 +196,7 @@ class ShoppingListResourceTest {
 		
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -216,7 +223,7 @@ class ShoppingListResourceTest {
 		currentUser.setId(1);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		Set<Product> products = new HashSet<>();
 		Product product = new Product();
 		Product product2 = new Product();
@@ -261,7 +268,7 @@ class ShoppingListResourceTest {
 		currentUser.setId(1);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		Set<Product> products2 = new HashSet<>();
 		Product product = new Product();
 		Product product2 = new Product();
@@ -292,8 +299,8 @@ class ShoppingListResourceTest {
      	doReturn("user").when(currentUser).getUsername();
      	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
      	doReturn(Optional.of(product)).when(productRepository).findById(101);
-     	doNothing().when(list).addProduct(product2);
      	doReturn(list).when(shoppinglistRepository).save(any());
+     	doReturn(products2).when(list).getProducts();
      	
         this.mockMvc.perform(post("/user/lists/{id}/{id2}", 10, 101)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -303,6 +310,8 @@ class ShoppingListResourceTest {
         		.andDo(print())
         		.andExpect(status().isCreated())
         		.andExpect(content().string("Product added to list"));
+        
+		Assertions.assertEquals(products2, list.getProducts());
 	}
 	
 	@Test
@@ -311,13 +320,22 @@ class ShoppingListResourceTest {
 		currentUser.setId(1);
 		list.setUser(currentUser);
 		list.setList_id(10);
-		list.setName("whishlist");
+		list.setName("wishlist");
 		Product product = new Product();
+		Product product2 = new Product();
 		product.setId(100);
 		product.setName("samsung");
 		product.setDescription("smartphone");
 		product.setPrice(1000.0);
+		product2.setId(101);
+		product2.setName("apple");
+		product2.setDescription("smartphone2");
+		product2.setPrice(1100.0);
 		products.add(product);
+		products.add(product2);
+		
+		Set<Product> products2 = new HashSet<>();
+		products2.add(product2);
 		
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -331,6 +349,7 @@ class ShoppingListResourceTest {
      	doReturn(Optional.of(product)).when(productRepository).findById(100);
      	doNothing().when(list).removeProduct(product);
      	doReturn(list).when(shoppinglistRepository).save(any());
+     	doReturn(products2).when(list).getProducts();
      	
         this.mockMvc.perform(delete("/user/lists/{id}/{id2}", 10, 100)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -339,6 +358,103 @@ class ShoppingListResourceTest {
         		.andDo(print())
         		.andExpect(status().isOk())
         		.andExpect(content().string("Product deleted from list"));
+        
+        Assertions.assertEquals(products2, list.getProducts());
+	}
+	
+	@Test
+	void shoppinglistCheckoutTest() throws Exception {
+		
+		currentUser.setId(1);
+		list.setUser(currentUser);
+		list.setList_id(10);
+		list.setName("wishlist");
+		Product product = new Product();
+		Product product2 = new Product();
+		product.setId(100);
+		product.setName("samsung");
+		product.setDescription("smartphone");
+		product.setPrice(1000.0);
+		product2.setId(101);
+		product2.setName("apple");
+		product2.setDescription("smartphone2");
+		product2.setPrice(1100.0);
+		products.add(product);
+		products.add(product2);
+		Stream<Product> stream = Stream.of(product, product2);
+//		Coupon coupon = new Coupon(1, "TOTAL15", 0.85);
+		
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+     	SecurityContextHolder.setContext(securityContext);
+     	
+     	doReturn(authentication).when(securityContext).getAuthentication();
+     	doReturn("user").when(authentication).getName();
+     	doReturn(currentUser).when(list).getUser();
+     	doReturn("user").when(currentUser).getUsername();
+     	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
+     	doReturn("wishlist").when(list).getName();
+     	doReturn(products).when(list).getProducts();
+     	doReturn(stream).when(products).stream();
+     	
+		this.mockMvc.perform(get("/user/lists/{id}/checkout", 10))
+		.andDo(print())
+		.andExpect(status().isOk())
+		.andExpect(content().string("Checkout for wishlist" + "\n" 
+					+ "Total cost: 2100,00" + "\n" + "\n"
+					+ "Do you want to apply a discount coupon?" + "\n"
+					+ "POST http://localhost:8080/user/lists/10/checkout with coupon code"));
+	}
+	
+	@Test
+	void applyDiscountCouponTest() throws Exception {
+		
+		currentUser.setId(1);
+		list.setUser(currentUser);
+		list.setList_id(10);
+		list.setName("wishlist");
+		Product product = new Product();
+		Product product2 = new Product();
+		product.setId(100);
+		product.setName("samsung");
+		product.setDescription("smartphone");
+		product.setPrice(1000.0);
+		product2.setId(101);
+		product2.setName("apple");
+		product2.setDescription("smartphone2");
+		product2.setPrice(1100.0);
+		products.add(product);
+		products.add(product2);
+		Stream<Product> stream = Stream.of(product, product2);
+		Coupon coupon = new Coupon(1, "TOTAL15", 0.85);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(coupon);
+		
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+     	SecurityContextHolder.setContext(securityContext);
+     	
+     	doReturn(authentication).when(securityContext).getAuthentication();
+     	doReturn("user").when(authentication).getName();
+     	doReturn(currentUser).when(list).getUser();
+     	doReturn("user").when(currentUser).getUsername();
+     	doReturn(Optional.of(list)).when(shoppinglistRepository).findById(10);
+     	doReturn("wishlist").when(list).getName();
+     	doReturn(products).when(list).getProducts();
+     	doReturn(stream).when(products).stream();
+     	doReturn(Optional.of(coupon)).when(couponRepository).findByCode("TOTAL15");
+     	
+		this.mockMvc.perform(post("/user/lists/{id}/checkout", 10)
+		.contentType(MediaType.APPLICATION_JSON)
+		.content(json)
+		.characterEncoding("utf-8")
+		.accept(MediaType.APPLICATION_JSON))
+		.andDo(print())
+		.andExpect(status().isOk())
+		.andExpect(content().string("Checkout for wishlist" + "\n" 
+					+ "Total cost: 1785,00" + "\n" + "\n"
+					+ "Discount coupon applied!"));
 	}
 
 }

@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,7 @@ public class UserResource {
 	private RoleRepository roleRepository;
 	
 	@PostMapping("/user")
-	public ResponseEntity<Object> register(@RequestBody User user) {
+	public ResponseEntity<Object> register(@Valid @RequestBody User user) {
 		Optional<Role> role = roleRepository.findByName("ROLE_USER");
 		user.setRole(role.get());
 		user.setEnabled(true);
@@ -41,7 +43,7 @@ public class UserResource {
 	}
 	
 	@PutMapping("/user/{name}")
-	public ResponseEntity<String> editUser(@PathVariable String name, @RequestBody User user) {
+	public ResponseEntity<String> editUser(@PathVariable String name,@Valid @RequestBody User user) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentPrincipalName = authentication.getName();
 		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only edit your account!");

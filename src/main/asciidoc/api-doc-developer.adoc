@@ -843,6 +843,8 @@ Possible errors:
 |The _name_ in request path doesn't point to a user account that the authenticated user can delete
 |===
 
+== *Shopping List related APIs*
+
 === *Retrieve all shopping lists for current user*
 
 Returns all existing shopping lists for current authenticated user.
@@ -1117,4 +1119,281 @@ Possible errors:
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
+|===
+
+=== *Checkout shopping list*
+
+Sets a shopping list for checkout, returns total cost and notifies user about the possibility of applying a discount coupon.
+
+....
+GET http://localhost:8080/user/lists/{id}/checkout
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list
+|===
+
+Example request:
+
+operation::shoppinglist-checkout-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can checkout
+|===
+
+=== *Apply discount coupon to shopping list*
+
+Applies discount coupon to shopping list and returns the modified total cost.
+
+....
+POST http://localhost:8080/user/lists/{id}/checkout
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the list
+|===
+
+Required fields:
+....
+{
+	code: {code}
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|code
+|String
+|Coupon code of the coupon to be applied
+|===
+
+Example request:
+
+operation::apply-discount-coupon-consumer[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The _id_ in request path doesn't point to a shopping list that the authenticated user can apply a discount coupon on
+|===
+
+== *Coupons related APIs*
+
+=== *Retrieve all coupons*
+
+Retrieves all active discount coupons.
+
+....
+GET http://localhost:8080/coupons
+....
+
+Example request:
+
+operation::retrieve-all-coupons-test[snippets='curl-request,http-request,http-response']
+
+_Notes:_
+
+- _If percentage > 1, the coupon offers a flat reduction!_
+....
+percentage = 100.0 -> totalCost - 100.0
+....
+- _If percentage < 1, the coupon offers a percentage reduction!_
+....
+percentage = 0.85 -> totalCost - 15%
+....
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+|===
+
+=== *Create a coupon*
+
+Creates a coupon and returns the result.
+
+....
+POST http://localhost:8080/coupons
+....
+
+Required fields:
+....
+{
+	"code" : "{coupon_code}",
+	"percentage" : "{coupon_percentage}"
+
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|code
+|String
+|Chosen coupon code for the coupon to be created
+
+|percentage
+|double
+|Chosen percentage* for the coupon to be applied
+|===
+
+_* When choosing a percentage keep in mind anything above 1.0 will be applied as flat value (ex. 100 -> totalCost - 100) and anything below will be applied as percentage value (ex. 0.85 -> totalCost - 15%)_
+
+Example request:
+
+operation::create-coupon-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+=== *Edit a coupon*
+
+Modifies a coupon and returns the result.
+
+....
+PUT http://localhost:8080/coupons/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the coupon to be edited
+|===
+
+Required fields:
+....
+{
+	"code" : "{coupon_code}",
+	"percentage" : "{coupon_percentage}"
+
+}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|code
+|String
+|New code for the edited coupon (use the current code if not desired to be changed)
+
+|percentage
+|double
+|New percentage for the edited coupon (use the current percentage if not desired to be changed)
+|===
+
+Example request:
+
+operation::edit-coupon-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
+|===
+
+=== *Delete a coupon*
+
+Deletes a coupon and returns confirmation.
+
+....
+DELETE http://localhost:8080/coupons/{id}
+....
+
+Where:
+[cols="2,2,5"]
+|===
+|Field |Type |Description
+
+|id
+|int
+|ID of the coupon to be edited
+|===
+
+Example request:
+
+operation::delete-coupon-test[snippets='curl-request,http-request,http-response']
+
+Possible errors:
+[cols="2,5"]
+|===
+|Error code |Description
+
+|400 Bad Request
+|Required fields were invalid or not specified 
+
+|401 Unauthorized
+|The credentials are invalid
+
+|403 Forbidden
+|The authenticated user doesn't have enough permissions to use this method
 |===

@@ -1,6 +1,7 @@
 package com.spring.onlinestore.shoppinglist;
 
 import java.net.URI;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.spring.onlinestore.coupon.Coupon;
+import com.spring.onlinestore.coupon.CouponRepository;
 import com.spring.onlinestore.exception.IllegalOperation;
 import com.spring.onlinestore.product.Product;
 import com.spring.onlinestore.product.ProductRepository;
@@ -39,6 +42,12 @@ public class ShoppingListResource {
 	
 	@Autowired
 	private ShoppingListRepository shoppinglistRepository;
+	
+	@Autowired
+	private CouponRepository couponRepository;
+	
+	double totalCost = 0;
+	private static final DecimalFormat df = new DecimalFormat("0.00");
 	
 	@JsonView(ShoppingListView.ProductsExcluded.class)
 	@GetMapping("/user/lists")
@@ -148,4 +157,46 @@ public class ShoppingListResource {
 		return ResponseEntity.ok().body("Product deleted from list");
 	}
 	
+	@GetMapping("/user/lists/{id}/checkout")
+	public ResponseEntity<String> shoppinglistCheckout(@PathVariable int id) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
+		
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
+		String name = shoppingList.getUser().getUsername();
+		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only checkout your list(s)!");
+		
+		totalCost = 0;
+		totalCost = shoppingList.getProducts().stream().mapToDouble(e -> e.getPrice()).sum();
+		
+		return ResponseEntity.ok().body("Checkout for " + shoppingList.getName() + "\n" 
+										+ "Total cost: " + df.format(totalCost) + "\n" + "\n"
+										+ "Do you want to apply a discount coupon?" + "\n"
+										+ "POST http://localhost:8080/user/lists/" + id + "/checkout with coupon code");
+	}
+	
+	@PostMapping("/user/lists/{id}/checkout")
+	public ResponseEntity<String> applyDiscountCoupon(@PathVariable int id, @RequestBody Coupon coupon) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentPrincipalName = authentication.getName();
+		
+		Optional<ShoppingList> optional2 = shoppinglistRepository.findById(id);
+		ShoppingList shoppingList = optional2.get();
+		String name = shoppingList.getUser().getUsername();
+		if(!Objects.equals(currentPrincipalName, name)) throw new IllegalOperation("You can only checkout your list(s)!");
+		
+		totalCost = 0;
+		totalCost = shoppingList.getProducts().stream().mapToDouble(e -> e.getPrice()).sum();
+		
+		Optional<Coupon> optional = couponRepository.findByCode(coupon.getCode());
+		Coupon c = optional.get();
+		
+		if(coupon.getPercentage() < 1.0) totalCost *= c.getPercentage();
+			else totalCost -= c.getPercentage();
+		
+		return ResponseEntity.ok().body("Checkout for " + shoppingList.getName() + "\n" 
+				+ "Total cost: " + df.format(totalCost) + "\n" + "\n"
+				+ "Discount coupon applied!");
+	}
 }

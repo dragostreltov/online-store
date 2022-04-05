@@ -29,12 +29,12 @@ public class CategoryResource {
 
 		
 	@JsonView(CategoryView.SubcatsExcluded.class)
-	@GetMapping(path="/categs")
+	@GetMapping("/categs")
 	public List<Category> retrieveAllCategories(){
 		return categoryRepository.findAll();
 	}
 	
-	@PostMapping(path="/categs")
+	@PostMapping("/categs")
 	public ResponseEntity<Object> createCategory(@Valid @RequestBody Category categ) {
 		Category savedCateg = categoryRepository.save(categ);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedCateg.getId()).toUri();
@@ -42,7 +42,7 @@ public class CategoryResource {
 	}
 	
 	@JsonView(CategoryView.SubcatsExcluded.class)
-	@PutMapping(path="/categs/{id}")
+	@PutMapping("/categs/{id}")
 	public Category editCategory(@PathVariable int id, @Valid @RequestBody Category categ) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);
@@ -52,7 +52,7 @@ public class CategoryResource {
 		return categoryRepository.save(categ);
 	}
 	
-	@DeleteMapping(path="/categs/{id}")
+	@DeleteMapping("/categs/{id}")
 	public ResponseEntity<String> deleteCategory(@PathVariable int id) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(optional.isEmpty()) throw new NotFoundException("Category id - " + id);

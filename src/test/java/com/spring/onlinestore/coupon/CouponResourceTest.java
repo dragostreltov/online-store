@@ -1,4 +1,4 @@
-package com.spring.onlinestore.subcategory;
+package com.spring.onlinestore.coupon;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,31 +36,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spring.onlinestore.category.Category;
-import com.spring.onlinestore.category.CategoryRepository;
-import com.spring.onlinestore.product.Product;
 
 @AutoConfigureRestDocs // defaults to target/generated-snippets
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
-public class SubcategoryResourceTest {
-	
+class CouponResourceTest {
+
 	@Mock
-	Category cat;
-	
-	@Mock
-	CategoryRepository categoryRepository;
-	
-	@Mock
-	SubcategoryRepository subcategoryRepository;
+	CouponRepository couponRepository;
 	
 	@InjectMocks
-	SubcategoryResource subcategoryResource;
+	CouponResource couponResource;
 	
 	MockMvc mockMvc;
 	
 	@BeforeEach
 	public void setUp(RestDocumentationContextProvider restDocumentation) {
-		this.mockMvc = MockMvcBuilders.standaloneSetup(subcategoryResource)
+		this.mockMvc = MockMvcBuilders.standaloneSetup(couponResource)
 				.apply(documentationConfiguration(restDocumentation))
 				 .alwaysDo(document("{method-name}", 
 						    preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
@@ -69,105 +59,84 @@ public class SubcategoryResourceTest {
 	}
 	
 	@Test
-	final void retrieveAllSubcategoriesTest() throws Exception {
+	void retrieveAllCouponsTest() throws Exception {
+		Coupon coupon1 = new Coupon(1, "TOTAL15", 0.85);
+		Coupon coupon2 = new Coupon(2, "TOTAL20", 0.80);
+		List<Coupon> list = List.of(coupon1, coupon2);
 		
-		cat.setId(1);
-		List<Product> products = new ArrayList<>();
+		doReturn(list).when(couponRepository).findAll();
 		
-		Subcategory sub1 = new Subcategory(10, "Subcategory1", products);
-		sub1.setCat(cat);
-		
-		Subcategory sub2 = new Subcategory(11, "Subcategory2", products);
-		sub2.setCat(cat);
-		
-		subcategoryRepository.saveAndFlush(sub1);
-		subcategoryRepository.saveAndFlush(sub2);
-		
-		List<Subcategory> list = List.of(sub1, sub2);
-		
-		doReturn(Optional.of(cat)).when(categoryRepository).findById(1);
-		doReturn(list).when(cat).getSubcats();
-		
-		this.mockMvc.perform(get("/categs/{id}/sub", 1))
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].id").value(10))
-				.andExpect(jsonPath("$[0].name").value("Subcategory1"))
-				.andExpect(jsonPath("$[1].id").value(11))
-				.andExpect(jsonPath("$[1].name").value("Subcategory2"));
+		this.mockMvc.perform(get("/coupons"))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].id").value(1))
+			.andExpect(jsonPath("$[0].code").value("TOTAL15"))
+			.andExpect(jsonPath("$[0].percentage").value(0.85))
+			.andExpect(jsonPath("$[1].id").value(2))
+			.andExpect(jsonPath("$[1].code").value("TOTAL20"))
+			.andExpect(jsonPath("$[1].percentage").value(0.80));
 	}
 	
 	@Test
-	final void createSubcategoryTest() throws Exception {
-		
-		cat.setId(1);
-		List<Product> products = new ArrayList<>();
-		
-		Subcategory sub1 = new Subcategory(10, "Subcategory1", products);
-		sub1.setCat(cat);
+	void createCouponTest() throws Exception {
+		Coupon coupon = new Coupon(1, "TOTAL15", 0.85);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(sub1);
+        String json = objectMapper.writeValueAsString(coupon);
         
-		doReturn(Optional.of(cat)).when(categoryRepository).findById(1);
-        doReturn(sub1).when(subcategoryRepository).save(any());
+        doReturn(coupon).when(couponRepository).save(any());
         
-        this.mockMvc.perform(post("/categs/{id}/sub", 1)
+		this.mockMvc.perform(post("/coupons")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json)
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", "http://localhost:8080/categs/1/sub/10"))
-				.andExpect(redirectedUrl("http://localhost:8080/categs/1/sub/10"));
+				.andExpect(header().string("Location", "http://localhost:8080/coupons/1"))
+				.andExpect(redirectedUrl("http://localhost:8080/coupons/1"));
 	}
 	
 	@Test
-	final void editSubcategoryTest() throws Exception {
-		
-		cat.setId(1);
-		List<Product> products = new ArrayList<>();
-		
-		Subcategory sub1 = new Subcategory(10, "Subcategory1", products);
-		sub1.setCat(cat);
-		subcategoryRepository.saveAndFlush(sub1);
-		
-		Subcategory sub2 = new Subcategory(10, "Subcategory2_modified", products);
+	void editCouponTest() throws Exception {
+		Coupon oldCoupon = new Coupon(1, "TOTAL15", 0.85);
+		couponRepository.saveAndFlush(oldCoupon);
+		Coupon newCoupon = new Coupon(1, "TOTAL20", 0.80);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(sub2);
+        String json = objectMapper.writeValueAsString(newCoupon);
         
-        doReturn(Optional.of(cat)).when(categoryRepository).findById(1);
-        doReturn(Optional.of(sub1)).when(subcategoryRepository).findById(10);
-        doReturn(sub2).when(subcategoryRepository).save(any());
-        
-        this.mockMvc.perform(put("/categs/{id}/sub/{id2}", 1, 10)
+		doReturn(Optional.of(oldCoupon)).when(couponRepository).findById(1);
+		doReturn(newCoupon).when(couponRepository).save(any());
+		
+		this.mockMvc.perform(put("/coupons/{id}", 1)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json)
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(10))
-				.andExpect(jsonPath("$.name").value("Subcategory2_modified"));
+    			.andExpect(jsonPath("$.id").value(1))
+    			.andExpect(jsonPath("$.code").value("TOTAL20"))
+    			.andExpect(jsonPath("$.percentage").value(0.80));
 	}
 	
 	@Test
-	final void deleteSubcategoryTest() throws Exception {
+	void deleteCouponTest() throws Exception {
+		Coupon oldCoupon = new Coupon(1, "TOTAL15", 0.85);
+		couponRepository.saveAndFlush(oldCoupon);
 		
-		List<Product> products = new ArrayList<>();
-		Subcategory sub1 = new Subcategory(10, "Subcategory1", products);
+		doReturn(Optional.of(oldCoupon)).when(couponRepository).findById(1);
+		doNothing().when(couponRepository).deleteById(1);
 		
-		doReturn(Optional.of(sub1)).when(subcategoryRepository).findById(10);
-		doNothing().when(subcategoryRepository).deleteById(10);
-		
-		this.mockMvc.perform(delete("/categs/*/sub/{id}", 10)
+        this.mockMvc.perform(delete("/coupons/{id}", 1)
 				.contentType(MediaType.APPLICATION_JSON)
 				.characterEncoding("utf-8")
 				.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(content().string("Subcategory deleted"));
+        		.andExpect(status().isOk())
+        		.andExpect(content().string("Coupon deleted"));
 	}
+	
+
 }

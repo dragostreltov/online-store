@@ -32,7 +32,7 @@ public class SubcategoryResource {
 	private SubcategoryRepository subcategoryRepository;
 	
 	@JsonView(SubcategoryView.ProductsExcluded.class)
-	@GetMapping(path="/categs/{id}/sub")
+	@GetMapping("/categs/{id}/sub")
 	public List<Subcategory> retrieveAllSubcategories(@PathVariable int id){
 		 Optional<Category> optional = categoryRepository.findById(id);
 		 if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);
@@ -41,7 +41,7 @@ public class SubcategoryResource {
 		 return cat.getSubcats();
 	}
 	
-	@PostMapping(path="/categs/{id}/sub")
+	@PostMapping("/categs/{id}/sub")
 	public ResponseEntity<Object> createSubcategory(@PathVariable int id, @Valid @RequestBody Subcategory sub) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);
@@ -55,7 +55,7 @@ public class SubcategoryResource {
 	}
 
 	@JsonView(SubcategoryView.ProductsExcluded.class)
-	@PutMapping(path="/categs/{id}/sub/{id2}")
+	@PutMapping("/categs/{id}/sub/{id2}")
 	public Subcategory editSubcategory(@PathVariable int id, @PathVariable int id2, @Valid @RequestBody Subcategory sub) {
 		Optional<Category> optional = categoryRepository.findById(id);
 		if(!optional.isPresent()) throw new NotFoundException("Category id - " + id);

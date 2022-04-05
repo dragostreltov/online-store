@@ -18,3 +18,6 @@ insert into shopping_product values(10112, 11);
 insert into shopping_product values(10111, 12);
 insert into shopping_product values(10113, 12);
 insert into shopping_product values(10113, 13);
+insert into coupon values(101, 'TOTAL15', 0.85);
+insert into coupon values(102, 'GIFT100', 100);
+insert into coupon values(103, 'RO22', 0.78);
