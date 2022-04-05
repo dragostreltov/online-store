@@ -277,14 +277,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _name_ in request path doesn't point to a user account that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid, not specified or violated constraints(ex. username not being unique)
 |===
 
 === *Delete user*
@@ -314,14 +314,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _name_ in request path doesn't point to a user account that the authenticated user can delete
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 == *Shopping List related APIs*
@@ -383,11 +383,11 @@ Possible errors:
 |===
 |Error code |Description
 
-|401 Unauthorized
-|The credentials are invalid
-
 |400 Bad Request
 |Required fields were invalid or not specified
+
+|401 Unauthorized
+|The credentials are invalid
 |===
 
 === *Edit a shopping list*
@@ -435,14 +435,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Delete a shopping list*
@@ -472,14 +472,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can delete
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 
@@ -510,14 +510,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can check
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Add a product to a shopping list*
@@ -551,14 +551,14 @@ Possible errors:
 |===
 |Error code |Description
 
+|400 Bad Request
+|Required fields were invalid or not specified 
+
 |401 Unauthorized
 |The credentials are invalid
 
 |403 Forbidden
 |The _id_ in request path doesn't point to a shopping list that the authenticated user can edit
-
-|400 Bad Request
-|Required fields were invalid or not specified 
 |===
 
 === *Delete a product from a shopping list*
