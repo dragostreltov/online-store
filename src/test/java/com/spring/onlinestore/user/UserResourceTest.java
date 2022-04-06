@@ -42,9 +42,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.onlinestore.role.Role;
 import com.spring.onlinestore.role.RoleRepository;
 
-//@ContextConfiguration
-//@ExtendWith(MockitoExtension.class)
-//@SpringJUnitConfig
 @AutoConfigureRestDocs // defaults to target/generated-snippets
 @ExtendWith({RestDocumentationExtension.class, MockitoExtension.class})
 class UserResourceTest {

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.spring.onlinestore.exception.IllegalOperation;
+import com.spring.onlinestore.exception.NotUniqueException;
 import com.spring.onlinestore.role.Role;
 import com.spring.onlinestore.role.RoleRepository;
 
@@ -36,6 +37,8 @@ public class UserResource {
 		Optional<Role> role = roleRepository.findByName("ROLE_USER");
 		user.setRole(role.get());
 		user.setEnabled(true);
+		userRepository.findAll().stream().filter(u -> u.getUsername().equals(user.getUsername())).findFirst().ifPresent(e -> {
+			throw new NotUniqueException("This name is already used!");});
 		userRepository.save(user);
 		
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{name}").buildAndExpand(user.getUsername()).toUri();
@@ -55,6 +58,11 @@ public class UserResource {
 		user.setRole(role.get());
 		user.setEnabled(true);
 		user.setId(dbuser.getId());
+		user.setShoppinglists(dbuser.getShoppinglists());
+		if(!Objects.equals(user.getUsername(), dbuser.getUsername())) {
+			userRepository.findAll().stream().filter(u -> u.getUsername().equals(user.getUsername())).findFirst().ifPresent(e -> {
+				throw new NotUniqueException("This name is already used!");});
+		}
 		userRepository.save(user);
 		return ResponseEntity.ok().body("User edited");
 	}
